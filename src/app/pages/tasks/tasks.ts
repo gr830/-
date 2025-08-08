@@ -1,0 +1,325 @@
+import { Component, OnInit, OnDestroy, LOCALE_ID } from '@angular/core';
+import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
+import { Router } from '@angular/router';
+import localeRu from '@angular/common/locales/ru';
+
+// Регистрируем русскую локализацию
+registerLocaleData(localeRu);
+
+const STATUS_LIST = [
+  { value: 0, label: 'Все задачи' },
+  { value: 1, label: 'Новые' },
+  { value: 2, label: 'Ждут выполнения' },
+  { value: 3, label: 'В работе' },
+  { value: 4, label: 'Предположительно завершены' },
+  { value: 5, label: 'Завершены' },
+  { value: 6, label: 'Отложены' },
+  { value: 7, label: 'Отклонены' },
+];
+
+const SORT_LIST = [
+  { value: 'ID', label: 'ID' },
+  { value: 'TITLE', label: 'Название' },
+  { value: 'DEADLINE', label: 'Крайний срок' },
+];
+
+const REFRESH_INTERVALS = [
+  { value: 0, label: 'Не обновлять' },
+  { value: 5, label: 'Каждые 5 минут' },
+  { value: 10, label: 'Каждые 10 минут' },
+  { value: 15, label: 'Каждые 15 минут' },
+  { value: 30, label: 'Каждые 30 минут' },
+  { value: 60, label: 'Каждый час' },
+];
+
+const PAGE_SIZE = 50;
+
+@Component({
+  selector: 'app-tasks',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './tasks.html',
+  styleUrl: './tasks.css',
+  providers: [
+    { provide: LOCALE_ID, useValue: 'ru' }
+  ]
+})
+export class Tasks implements OnInit, OnDestroy {
+  tasks: any[] = [];
+  loading = false;
+  error = '';
+  statusList = STATUS_LIST;
+  selectedStatus = 0;
+  page = 1;
+  total = 0;
+  search = '';
+  sortField = 'ID';
+  sortDirection: 'asc' | 'desc' = 'asc';
+  sortList = SORT_LIST;
+  refreshIntervals = REFRESH_INTERVALS;
+  selectedRefresh = 0;
+  private refreshTimer: any = null;
+  // Фильтр по дедлайну (диапазон дат)
+  deadlineFrom: string = '';
+  deadlineTo: string = '';
+
+  constructor(private router: Router) {}
+
+  ngOnInit() {
+    if (localStorage.getItem('isAuth') !== '1') {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.fetchTasks();
+    this.setupAutoRefresh();
+  }
+
+  ngOnDestroy() {
+    this.clearAutoRefresh();
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '?';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  }
+
+  formatDeadline(deadline: string | null): string {
+    if (!deadline) return 'Не указан';
+    
+    const date = new Date(deadline);
+    if (isNaN(date.getTime())) return 'Неверный формат';
+    
+    // Форматируем в русском стиле: 08.08.2025 14:30
+    return date.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
+
+  getStatusLabel(statusValue: number): string {
+    const status = this.statusList.find(s => s.value === statusValue);
+    return status ? status.label : 'Неизвестный статус';
+  }
+
+  getStatusColor(statusValue: number): string {
+    switch (statusValue) {
+      case 1: return '#4CAF50'; // Новые - зеленый
+      case 2: return '#FF9800'; // Ждут выполнения - оранжевый
+      case 3: return '#2196F3'; // В работе - синий
+      case 4: return '#9C27B0'; // Предположительно завершены - фиолетовый
+      case 5: return '#4CAF50'; // Завершены - зеленый
+      case 6: return '#FF5722'; // Отложены - красный
+      case 7: return '#F44336'; // Отклонены - красный
+      default: return '#757575'; // По умолчанию - серый
+    }
+  }
+
+  // Унифицированное получение значения статуса из разных возможных полей ответа Bitrix24
+  getTaskStatusValue(task: any): number {
+    if (!task) return 0;
+    const raw =
+      task.real_status ??
+      task.realStatus ??
+      task.status ??
+      task.STATUS ??
+      task.REAL_STATUS;
+    if (typeof raw === 'number') return raw;
+    const parsed = parseInt(String(raw), 10);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
+  setupAutoRefresh() {
+    this.clearAutoRefresh();
+    if (this.selectedRefresh > 0) {
+      this.refreshTimer = setInterval(() => {
+        this.fetchTasks();
+      }, this.selectedRefresh * 60 * 1000);
+    }
+  }
+
+  clearAutoRefresh() {
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+      this.refreshTimer = null;
+    }
+  }
+
+  onRefreshChange(event: any) {
+    this.selectedRefresh = +event.target.value;
+    this.setupAutoRefresh();
+  }
+
+  manualRefresh() {
+    this.fetchTasks();
+  }
+
+  get groupedTasks() {
+    const groups: { [key: string]: any[] } = {};
+    for (const task of this.filteredTasks()) {
+      const name = task.responsible?.name || 'Без исполнителя';
+      if (!groups[name]) groups[name] = [];
+      groups[name].push(task);
+    }
+    return groups;
+  }
+
+  filteredTasks() {
+    if (!this.search.trim()) return this.tasks;
+    const q = this.search.trim().toLowerCase();
+    return this.tasks.filter(task => (task.title || '').toLowerCase().includes(q));
+  }
+
+  onStatusChange(event: any) {
+    this.selectedStatus = +event.target.value;
+    this.page = 1;
+    this.fetchTasks();
+  }
+
+  onSortChange(event: any) {
+    this.sortField = event.target.value;
+    this.page = 1;
+    this.fetchTasks();
+  }
+
+  onSortDirectionChange(event: any) {
+    this.sortDirection = event.target.value;
+    this.page = 1;
+    this.fetchTasks();
+  }
+
+  onSearchChange(event: any) {
+    this.search = event.target.value;
+    // Не сбрасываем страницу, поиск по локальному массиву
+  }
+
+  onDeadlineFromChange(event: any) {
+    this.deadlineFrom = event.target.value;
+    this.page = 1;
+    this.fetchTasks();
+  }
+
+  onDeadlineToChange(event: any) {
+    this.deadlineTo = event.target.value;
+    this.page = 1;
+    this.fetchTasks();
+  }
+
+  clearDeadlineFilter() {
+    this.deadlineFrom = '';
+    this.deadlineTo = '';
+    this.page = 1;
+    this.fetchTasks();
+  }
+
+  private formatDeadlineForFilter(dateString: string, endOfDay: boolean): string {
+    // Вход: YYYY-MM-DD из <input type="date">
+    if (!dateString) return '';
+    const [yearStr, monthStr, dayStr] = dateString.split('-');
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10);
+    const day = parseInt(dayStr, 10);
+    const hours = endOfDay ? 23 : 0;
+    const minutes = endOfDay ? 59 : 0;
+    const seconds = endOfDay ? 59 : 0;
+
+    const localDate = new Date(year, month - 1, day, hours, minutes, seconds);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const tzoMinutes = -localDate.getTimezoneOffset();
+    const sign = tzoMinutes >= 0 ? '+' : '-';
+    const abs = Math.abs(tzoMinutes);
+    const tzH = pad(Math.floor(abs / 60));
+    const tzM = pad(abs % 60);
+    const tz = `${sign}${tzH}:${tzM}`;
+
+    const yyyy = localDate.getFullYear();
+    const MM = pad(localDate.getMonth() + 1);
+    const dd = pad(localDate.getDate());
+    const HH = pad(localDate.getHours());
+    const mm = pad(localDate.getMinutes());
+    const ss = pad(localDate.getSeconds());
+
+    // Формат: YYYY-MM-DDThh:mm:ss±hh:mm согласно Bitrix24
+    return `${yyyy}-${MM}-${dd}T${HH}:${mm}:${ss}${tz}`;
+  }
+
+  fetchTasks() {
+    this.loading = true;
+    this.error = '';
+    const start = (this.page - 1) * PAGE_SIZE;
+
+    const baseUrl = 'https://grosver-group.bitrix24.by/rest/196/gh4cf21vcpwrgub8/tasks.task.list';
+    const url = new URL(baseUrl);
+    const params = new URLSearchParams();
+    params.set('filter[GROUP_ID]', '174');
+    params.set('start', String(start));
+
+    if (this.selectedStatus !== 0) {
+      params.set('filter[REAL_STATUS]', String(this.selectedStatus));
+    }
+
+    // Фильтр по дедлайну: включительно по дням (начало/конец суток) в ISO 8601 с таймзоной
+    let from = this.deadlineFrom;
+    let to = this.deadlineTo;
+    if (from && to && from > to) {
+      [from, to] = [to, from];
+    }
+    if (from) {
+      params.set('filter[>=DEADLINE]', this.formatDeadlineForFilter(from, false));
+    }
+    if (to) {
+      params.set('filter[<=DEADLINE]', this.formatDeadlineForFilter(to, true));
+    }
+
+    params.set(`order[${this.sortField}]`, this.sortDirection);
+    url.search = params.toString();
+
+    // Для отладки можно посмотреть финальный URL в консоли
+    try { console.log('[tasks] request:', url.toString()); } catch {}
+
+    fetch(url.toString())
+      .then(async response => {
+        if (!response.ok) {
+          let message = `HTTP ${response.status}`;
+          try {
+            const err = await response.json();
+            message = err?.error_description || err?.error || message;
+          } catch {}
+          throw new Error(message);
+        }
+        return response.json();
+      })
+      .then(data => {
+        this.tasks = data.result?.tasks || [];
+        // Bitrix может возвращать total в разных местах; делаем максимально устойчиво
+        this.total = data.total || data.result?.total || this.tasks.length;
+        this.loading = false;
+      })
+      .catch(err => {
+        this.error = `Ошибка загрузки задач: ${err?.message || err}`;
+        this.loading = false;
+      });
+  }
+
+  nextPage() {
+    if (this.page * PAGE_SIZE < this.total) {
+      this.page++;
+      this.fetchTasks();
+    }
+  }
+
+  prevPage() {
+    if (this.page > 1) {
+      this.page--;
+      this.fetchTasks();
+    }
+  }
+
+  logout() {
+    localStorage.removeItem('isAuth');
+    this.router.navigate(['/login']);
+  }
+}

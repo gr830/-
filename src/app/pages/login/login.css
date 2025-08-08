@@ -1,0 +1,87 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #f5f7fa 0%, #c3ecfd 100%);
+  animation: bgmove 10s ease-in-out infinite alternate;
+}
+@keyframes bgmove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+.login-container {
+  background: rgba(255,255,255,0.98);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(23, 158, 220, 0.13);
+  padding: 2.5rem 2rem 2rem 2rem;
+  min-width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  transition: box-shadow 0.3s;
+}
+.login-container:hover {
+  box-shadow: 0 12px 48px 0 rgba(23, 158, 220, 0.18);
+}
+.login-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #179edc;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+}
+.login-form label {
+  display: block;
+  font-size: 1rem;
+  color: #179edc;
+  margin-bottom: 0.5rem;
+}
+.login-form input {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #50c878;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+  background: #f5f7fa;
+}
+.login-form input:focus {
+  border: 1.5px solid #179edc;
+  box-shadow: 0 0 0 2px #50c87855;
+}
+.login-form button {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(90deg, #179edc 0%, #50c878 100%);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 2px 8px 0 #179edc22;
+}
+.login-form button:hover {
+  background: linear-gradient(90deg, #50c878 0%, #179edc 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+.error-message {
+  color: #e74c3c;
+  font-size: 1rem;
+  margin-top: -0.5rem;
+  text-align: center;
+  animation: shake 0.3s;
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}

@@ -1,0 +1,74 @@
+<h2>Список задач</h2>
+<button (click)="logout()">Выйти</button>
+
+<div class="tasks-controls">
+  <label>
+    Фильтр по статусу:
+    <select [value]="selectedStatus" (change)="onStatusChange($event)">
+      <option *ngFor="let status of statusList" [value]="status.value">{{ status.label }}</option>
+    </select>
+  </label>
+  <label>
+    Поиск по названию:
+    <input type="text" [value]="search" (input)="onSearchChange($event)" placeholder="Введите часть названия..." />
+  </label>
+  <label>
+    Сортировка:
+    <select [value]="sortField" (change)="onSortChange($event)">
+      <option *ngFor="let sort of sortList" [value]="sort.value">{{ sort.label }}</option>
+    </select>
+    <select [value]="sortDirection" (change)="onSortDirectionChange($event)">
+      <option value="asc">По возрастанию</option>
+      <option value="desc">По убыванию</option>
+    </select>
+  </label>
+  <label>
+    Автообновление:
+    <select [value]="selectedRefresh" (change)="onRefreshChange($event)">
+      <option *ngFor="let interval of refreshIntervals" [value]="interval.value">{{ interval.label }}</option>
+    </select>
+  </label>
+  <label>
+    Дедлайн от:
+    <input type="date" [value]="deadlineFrom" (change)="onDeadlineFromChange($event)" />
+  </label>
+  <label>
+    Дедлайн до:
+    <input type="date" [value]="deadlineTo" (change)="onDeadlineToChange($event)" />
+  </label>
+  <button (click)="clearDeadlineFilter()">Сбросить дедлайн</button>
+  <button (click)="manualRefresh()" style="background:linear-gradient(90deg,#50c878 0%,#179edc 100%);font-size:1.1rem;min-width:120px;">Обновить</button>
+</div>
+
+<div *ngIf="loading">Загрузка...</div>
+<div *ngIf="error" class="error-message">{{ error }}</div>
+
+<div *ngIf="!loading && !error">
+  <div style="margin: 10px 0; text-align:center;">
+    <button (click)="prevPage()" [disabled]="page === 1">Назад</button>
+    <span>Страница {{ page }} (показано {{ filteredTasks().length }} из {{ total }})</span>
+    <button (click)="nextPage()" [disabled]="page * 50 >= total">Вперёд</button>
+  </div>
+  <div class="tasks-columns">
+    <div *ngFor="let name of (groupedTasks | keyvalue)" class="tasks-column">
+      <div class="avatar-wrapper">
+        <ng-container *ngIf="name.value[0]?.responsible?.icon; else initials">
+          <img [src]="name.value[0].responsible.icon" alt="avatar" class="avatar-img" />
+        </ng-container>
+        <ng-template #initials>
+          <div class="avatar-placeholder">{{ getInitials(name.key) }}</div>
+        </ng-template>
+      </div>
+      <h3>{{ name.key }}</h3>
+      <ul>
+        <li *ngFor="let task of name.value">
+          <b>{{ task.title }}</b><br />
+          <span>Дедлайн: {{ formatDeadline(task.deadline) }}</span><br />
+          <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">
+            {{ getStatusLabel(getTaskStatusValue(task)) }}
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

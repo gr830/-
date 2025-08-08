@@ -1,0 +1,15 @@
+<div class="login-container">
+  <div class="login-title">Вход в систему</div>
+  <form class="login-form" (ngSubmit)="login()" #loginForm="ngForm">
+    <label>
+      Логин
+      <input type="text" name="username" [(ngModel)]="username" required autocomplete="username" placeholder="Введите логин" />
+    </label>
+    <label>
+      Пароль
+      <input type="password" name="password" [(ngModel)]="password" required autocomplete="current-password" placeholder="Введите пароль" />
+    </label>
+    <button type="submit">Войти</button>
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+  </form>
+</div>
