@@ -41,7 +41,10 @@ jobs:
             echo "::error ::index.html not found in dist output"
             exit 1
           fi
-          cp "$DIST/index.html" "$DIST/404.html"
+
+      - name: Prepare SPA 404
+        run: |
+          cp "${{ env.DIST }}/index.html" "${{ env.DIST }}/404.html"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
