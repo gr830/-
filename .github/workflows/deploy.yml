@@ -33,12 +33,20 @@ jobs:
       - name: Build Angular app
         run: |
           npx --yes ng build --configuration production --base-href /-/
-          cp dist/angular-project/index.html dist/angular-project/404.html
+          if [ -f "dist/angular-project/index.html" ]; then
+            echo "DIST=dist/angular-project" >> $GITHUB_ENV
+          elif [ -f "dist/angular-project/browser/index.html" ]; then
+            echo "DIST=dist/angular-project/browser" >> $GITHUB_ENV
+          else
+            echo "::error ::index.html not found in dist output"
+            exit 1
+          fi
+          cp "$DIST/index.html" "$DIST/404.html"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/angular-project
+          path: ${{ env.DIST }}
 
   deploy:
     needs: build
