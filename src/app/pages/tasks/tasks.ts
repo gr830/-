@@ -1,5 +1,6 @@
-import { Component, OnInit, OnDestroy, LOCALE_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, LOCALE_ID, HostListener } from '@angular/core';
 import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import localeRu from '@angular/common/locales/ru';
 
@@ -37,7 +38,7 @@ const PAGE_SIZE = 50;
 @Component({
   selector: 'app-tasks',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './tasks.html',
   styleUrl: './tasks.css',
   providers: [
@@ -62,6 +63,13 @@ export class Tasks implements OnInit, OnDestroy {
   // Фильтр по дедлайну (диапазон дат)
   deadlineFrom: string = '';
   deadlineTo: string = '';
+  // Фильтр по исполнителю
+  responsibleList: Array<{ value: number; label: string }> = [
+    { value: 0, label: 'Все исполнители' }
+  ];
+  selectedResponsible = 0;
+  private responsibleIdToName: Record<number, string> = {};
+  showScrollDown = false;
 
   constructor(private router: Router) {}
 
@@ -70,8 +78,16 @@ export class Tasks implements OnInit, OnDestroy {
       this.router.navigate(['/login']);
       return;
     }
+    this.loadResponsibleFromStorage();
+    this.rebuildResponsibleListFromMap();
+    // По умолчанию ставим текущую дату в фильтр дедлайна (диапазон за сегодня)
+    const todayStr = this.formatDateForInput(new Date());
+    this.deadlineFrom = todayStr;
+    this.deadlineTo = todayStr;
     this.fetchTasks();
     this.setupAutoRefresh();
+    // Первичная оценка видимости кнопки после начальной отрисовки
+    setTimeout(() => this.updateScrollButtonVisibility(), 0);
   }
 
   ngOnDestroy() {
@@ -132,6 +148,47 @@ export class Tasks implements OnInit, OnDestroy {
     return isNaN(parsed) ? 0 : parsed;
   }
 
+  // Форматирует Date в строку для input type="date": YYYY-MM-DD
+  private formatDateForInput(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    const MM = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    return `${yyyy}-${MM}-${dd}`;
+  }
+
+  private rebuildResponsibleListFromMap() {
+    const options = Object.entries(this.responsibleIdToName)
+      .map(([id, name]) => ({ value: Number(id), label: name as string }))
+      .sort((a, b) => a.label.localeCompare(b.label, 'ru'));
+    this.responsibleList = [{ value: 0, label: 'Все исполнители' }, ...options];
+  }
+
+  private persistResponsibleToStorage() {
+    try {
+      const payload: Record<string, string> = {};
+      for (const [id, name] of Object.entries(this.responsibleIdToName)) {
+        payload[id] = name as string;
+      }
+      localStorage.setItem('responsibleMap', JSON.stringify(payload));
+    } catch {}
+  }
+
+  private loadResponsibleFromStorage() {
+    try {
+      const raw = localStorage.getItem('responsibleMap');
+      if (!raw) return;
+      const obj = JSON.parse(raw) as Record<string, string>;
+      this.responsibleIdToName = {} as Record<number, string>;
+      for (const [idStr, name] of Object.entries(obj)) {
+        const id = parseInt(idStr, 10);
+        if (!isNaN(id) && name && typeof name === 'string') {
+          this.responsibleIdToName[id] = name;
+        }
+      }
+    } catch {}
+  }
+
   setupAutoRefresh() {
     this.clearAutoRefresh();
     if (this.selectedRefresh > 0) {
@@ -155,6 +212,31 @@ export class Tasks implements OnInit, OnDestroy {
 
   manualRefresh() {
     this.fetchTasks();
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll() {
+    this.updateScrollButtonVisibility();
+  }
+
+  private updateScrollButtonVisibility() {
+    try {
+      const doc = document.documentElement;
+      const scrollTop = window.scrollY || doc.scrollTop || 0;
+      const scrollHeight = doc.scrollHeight || 0;
+      const clientHeight = doc.clientHeight || window.innerHeight || 0;
+      const threshold = 24;
+      const isScrollable = scrollHeight > clientHeight + threshold;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - threshold;
+      this.showScrollDown = isScrollable && !atBottom;
+    } catch {
+      this.showScrollDown = false;
+    }
+  }
+
+  scrollDown() {
+    window.scrollBy({ top: Math.round(window.innerHeight * 0.85), left: 0, behavior: 'smooth' });
+    setTimeout(() => this.updateScrollButtonVisibility(), 350);
   }
 
   get groupedTasks() {
@@ -194,6 +276,12 @@ export class Tasks implements OnInit, OnDestroy {
   onSearchChange(event: any) {
     this.search = event.target.value;
     // Не сбрасываем страницу, поиск по локальному массиву
+  }
+
+  onResponsibleChange(value: any) {
+    this.selectedResponsible = Number(value);
+    this.page = 1;
+    this.fetchTasks();
   }
 
   onDeadlineFromChange(event: any) {
@@ -261,6 +349,10 @@ export class Tasks implements OnInit, OnDestroy {
       params.set('filter[REAL_STATUS]', String(this.selectedStatus));
     }
 
+    if (this.selectedResponsible !== 0) {
+      params.set('filter[RESPONSIBLE_ID]', String(this.selectedResponsible));
+    }
+
     // Фильтр по дедлайну: включительно по дням (начало/конец суток) в ISO 8601 с таймзоной
     let from = this.deadlineFrom;
     let to = this.deadlineTo;
@@ -296,6 +388,19 @@ export class Tasks implements OnInit, OnDestroy {
         this.tasks = data.result?.tasks || [];
         // Bitrix может возвращать total в разных местах; делаем максимально устойчиво
         this.total = data.total || data.result?.total || this.tasks.length;
+        // Обновляем список исполнителей (накапливаем уникальные id->name)
+        for (const t of this.tasks) {
+          const rawId = t?.responsible?.id;
+          const id = typeof rawId === 'string' ? parseInt(rawId, 10) : rawId;
+          const name = t?.responsible?.name;
+          if (typeof id === 'number' && id > 0 && typeof name === 'string' && name.trim()) {
+            this.responsibleIdToName[id] = name.trim();
+          }
+        }
+        this.persistResponsibleToStorage();
+        this.rebuildResponsibleListFromMap();
+        // Обновляем видимость кнопки после загрузки задач
+        setTimeout(() => this.updateScrollButtonVisibility(), 0);
         this.loading = false;
       })
       .catch(err => {
