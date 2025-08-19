@@ -1,3 +1,4 @@
+       
 name: Deploy Angular to GitHub Pages
 
 on:
@@ -32,9 +33,15 @@ jobs:
 
       - name: Build Angular app
         run: |
-          npx --yes ng build --configuration production --base-href /-
-          echo "DIST=dist/canban" >> $GITHUB_ENV
-          ls -R dist
+          npx --yes ng build --configuration production --base-href /-/
+          if [ -f "dist/canban/index.html" ]; then
+            echo "DIST=dist/canban" >> $GITHUB_ENV
+          elif [ -f "dist/canban/browser/index.html" ]; then
+            echo "DIST=dist/canban/browser" >> $GITHUB_ENV
+          else
+            echo "::error ::index.html not found in dist output"
+            exit 1
+          fi
 
       - name: Prepare SPA 404
         run: |
@@ -55,5 +62,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-        
