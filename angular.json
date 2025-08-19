@@ -19,6 +19,7 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "index": "src/index.html",
+            "outputPath": "dist",
             "assets": [
               {
                 "glob": "**/*",
