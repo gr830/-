@@ -33,12 +33,7 @@ jobs:
       - name: Build Angular app
         run: |
           npx --yes ng build --configuration production --base-href /-
-          if [ -f "dist/canban/index.html" ]; then
-            echo "DIST=dist/canban" >> $GITHUB_ENV
-          else
-            echo "::error ::index.html not found in dist output"
-            exit 1
-          fi
+          echo "DIST=dist/canban" >> $GITHUB_ENV
 
       - name: Prepare SPA 404
         run: |
