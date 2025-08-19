@@ -34,6 +34,7 @@ jobs:
         run: |
           npx --yes ng build --configuration production --base-href /-
           echo "DIST=dist/canban" >> $GITHUB_ENV
+          ls -R dist
 
       - name: Prepare SPA 404
         run: |
