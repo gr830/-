@@ -427,4 +427,8 @@ export class Tasks implements OnInit, OnDestroy {
     localStorage.removeItem('isAuth');
     this.router.navigate(['/login']);
   }
+
+  goToSearch() {
+    this.router.navigate(['/search']);
+  }
 }

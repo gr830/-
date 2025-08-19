@@ -1,5 +1,5 @@
 {
-  "name": "angular-project",
+  "name": "canban",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",

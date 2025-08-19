@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-project": {
+    "canban": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -56,10 +56,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "angular-project:build:production"
+              "buildTarget": "canban:build:production"
             },
             "development": {
-              "buildTarget": "angular-project:build:development"
+              "buildTarget": "canban:build:development"
             }
           },
           "defaultConfiguration": "development"

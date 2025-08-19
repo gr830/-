@@ -1,0 +1,55 @@
+<h2>Поиск задач</h2>
+<button (click)="goBackToTasks()" style="background:linear-gradient(90deg, #179edc 0%, #50c878 100%);font-size:1.1rem;min-width:120px; margin-bottom: 20px;">Назад к задачам</button>
+
+<div class="tasks-controls">
+  <label>
+    Поиск по названию:
+    <input type="text" [(ngModel)]="searchTitle" placeholder="Введите название задачи..." />
+  </label>
+  <label>
+    ID группы:
+    <input type="number" [(ngModel)]="groupId" placeholder="Введите ID группы (по умолчанию 174)" />
+  </label>
+  <label>
+    Исполнитель ID:
+    <input type="number" [(ngModel)]="responsibleId" placeholder="Введите ID исполнителя" />
+  </label>
+  <label>
+    Статус:
+    <select [(ngModel)]="selectedStatus">
+      <option *ngFor="let status of statusList" [value]="status.value">{{ status.label }}</option>
+    </select>
+  </label>
+  <label>
+    Дедлайн от:
+    <input type="date" [(ngModel)]="deadlineFrom" />
+  </label>
+  <label>
+    Дедлайн до:
+    <input type="date" [(ngModel)]="deadlineTo" />
+  </label>
+  <button (click)="clearDeadlineFilter()">Сбросить дедлайн</button>
+  <button (click)="searchTasks()" style="background:linear-gradient(90deg,#50c878 0%,#179edc 100%);font-size:1.1rem;min-width:120px;">Искать</button>
+</div>
+
+<div *ngIf="loading">Загрузка...</div>
+<div *ngIf="error" class="error-message">{{ error }}</div>
+
+<div *ngIf="!loading && !error && tasks.length > 0" class="search-results">
+  <div *ngFor="let task of tasks" class="search-result-card">
+    <h3>{{ task.title }}</h3>
+    <p><b>Статус:     </b> <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">{{ getStatusLabel(getTaskStatusValue(task)) }}</span></p>
+    <p *ngIf="task.responsible"><b>Исполнитель:</b> {{ task.responsible.name }} </p>
+    <p *ngIf="task.deadline"><b>Дедлайн:</b> {{ formatDeadline(task.deadline) }}</p>
+  </div>
+</div>
+
+<div *ngIf="!loading && !error && tasks.length === 0" style="text-align: center; margin-top: 20px;">
+  <p>Задачи не найдены.</p>
+</div>
+
+<div style="margin: 10px 0; text-align:center;" class="pagination-controls">
+  <button (click)="prevPage()" [disabled]="page === 1">Назад</button>
+  <span>Страница {{ page }} (показано {{ tasks.length }} из {{ total }})</span>
+  <button (click)="nextPage()" [disabled]="page * pageSize >= total">Вперёд</button>
+</div>
