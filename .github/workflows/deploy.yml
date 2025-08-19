@@ -40,6 +40,11 @@ jobs:
             exit 1
           fi
 
+      - name: List dist contents
+        run: |
+          ls -R dist
+          ls -R dist/assets
+
       - name: Prepare SPA 404
         run: |
           cp "${{ env.DIST }}/index.html" "${{ env.DIST }}/404.html"
@@ -61,3 +66,4 @@ jobs:
         uses: actions/deploy-pages@v4
 
 
+        
