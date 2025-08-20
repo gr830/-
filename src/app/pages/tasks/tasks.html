@@ -51,10 +51,10 @@
 <div *ngIf="error" class="error-message">{{ error }}</div>
 
 <div *ngIf="!loading && !error">
-  <div style="margin: 10px 0; text-align:center;">
-    <button (click)="prevPage()" [disabled]="page === 1">Назад</button>
-    <span>Страница {{ page }} (показано {{ filteredTasks().length }} из {{ total }})</span>
-    <button (click)="nextPage()" [disabled]="page * 50 >= total">Вперёд</button>
+  <div style="margin: 10px 5px; text-align:center;">
+    <button style="margin: 5px;" (click)="prevPage()" [disabled]="page === 1">Назад</button>
+    <span> Страница {{ page }} (показано {{ filteredTasks().length }} из {{ total }}) </span>
+    <button  style="margin: 5px;" (click)="nextPage()" [disabled]="page * 50 >= total">Вперёд</button>
   </div>
   <div class="tasks-columns">
     <div *ngFor="let name of (groupedTasks | keyvalue)" class="tasks-column">
