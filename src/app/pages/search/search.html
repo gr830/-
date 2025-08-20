@@ -50,6 +50,6 @@
 
 <div style="margin: 10px 0; text-align:center;" class="pagination-controls">
   <button (click)="prevPage()" [disabled]="page === 1">Назад</button>
-  <span>Страница {{ page }} (показано {{ tasks.length }} из {{ total }})</span>
-  <button (click)="nextPage()" [disabled]="page * pageSize >= total">Вперёд</button>
+  <span>Страница {{ page }} (показано {{ tasks.length }} из {{ total }} )</span>
+  <button (click)="nextPage()" [disabled]="page * pageSize >= total"> Вперёд</button>
 </div>
