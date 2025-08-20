@@ -30,7 +30,7 @@
   </label>
   <label>
     Автообновление:
-    <select [value]="selectedRefresh" (change)="onRefreshChange($event)">
+    <select [(ngModel)]="selectedRefresh" (ngModelChange)="onRefreshChange($event)">
       <option *ngFor="let interval of refreshIntervals" [value]="interval.value">{{ interval.label }}</option>
     </select>
   </label>

@@ -58,7 +58,7 @@ export class Tasks implements OnInit, OnDestroy {
   sortDirection: 'asc' | 'desc' = 'asc';
   sortList = SORT_LIST;
   refreshIntervals = REFRESH_INTERVALS;
-  selectedRefresh = 0;
+  selectedRefresh = 5;
   private refreshTimer: any = null;
   // Фильтр по дедлайну (диапазон дат)
   deadlineFrom: string = '';
@@ -211,6 +211,9 @@ export class Tasks implements OnInit, OnDestroy {
   }
 
   manualRefresh() {
+    const todayStr = this.formatDateForInput(new Date());
+    this.deadlineFrom = todayStr;
+    this.deadlineTo = todayStr;
     this.fetchTasks();
   }
 
