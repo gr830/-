@@ -54,7 +54,7 @@ export class Tasks implements OnInit, OnDestroy {
   page = 1;
   total = 0;
   search = '';
-  sortField = 'ID';
+  sortField = 'DEADLINE';
   sortDirection: 'asc' | 'desc' = 'asc';
   sortList = SORT_LIST;
   refreshIntervals = REFRESH_INTERVALS;

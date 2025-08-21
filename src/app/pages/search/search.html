@@ -11,10 +11,6 @@
     <input type="number" [(ngModel)]="groupId" placeholder="Введите ID группы (по умолчанию 174)" />
   </label>
   <label>
-    Исполнитель ID:
-    <input type="number" [(ngModel)]="responsibleId" placeholder="Введите ID исполнителя" />
-  </label>
-  <label>
     Статус:
     <select [(ngModel)]="selectedStatus">
       <option *ngFor="let status of statusList" [value]="status.value">{{ status.label }}</option>
