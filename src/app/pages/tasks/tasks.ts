@@ -193,7 +193,13 @@ export class Tasks implements OnInit, OnDestroy {
     this.clearAutoRefresh();
     if (this.selectedRefresh > 0) {
       this.refreshTimer = setInterval(() => {
-        this.fetchTasks(true);
+        // Принудительно ставим сортировку и текущую дату
+        this.sortField = 'DEADLINE';
+        this.sortDirection = 'asc';
+        const todayStr = this.formatDateForInput(new Date());
+        this.deadlineFrom = todayStr;
+        this.deadlineTo = todayStr;
+        this.fetchTasks();
       }, this.selectedRefresh * 60 * 1000);
     }
   }
@@ -211,6 +217,9 @@ export class Tasks implements OnInit, OnDestroy {
   }
 
   manualRefresh() {
+    // Принудительно ставим сортировку и текущую дату
+    this.sortField = 'DEADLINE';
+    this.sortDirection = 'asc';
     const todayStr = this.formatDateForInput(new Date());
     this.deadlineFrom = todayStr;
     this.deadlineTo = todayStr;
@@ -264,14 +273,14 @@ export class Tasks implements OnInit, OnDestroy {
     this.fetchTasks();
   }
 
-  onSortChange(event: any) {
-    this.sortField = event.target.value;
+  onSortChange(value: any) {
+    this.sortField = value;
     this.page = 1;
     this.fetchTasks();
   }
 
-  onSortDirectionChange(event: any) {
-    this.sortDirection = event.target.value;
+  onSortDirectionChange(value: any) {
+    this.sortDirection = value;
     this.page = 1;
     this.fetchTasks();
   }

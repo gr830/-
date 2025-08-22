@@ -20,10 +20,10 @@
   </label>
   <label>
     Сортировка:
-    <select [value]="sortField" (change)="onSortChange($event)">
+    <select [ngModel]="sortField" (ngModelChange)="onSortChange($event)">
       <option *ngFor="let sort of sortList" [value]="sort.value">{{ sort.label }}</option>
     </select>
-    <select [value]="sortDirection" (change)="onSortDirectionChange($event)">
+    <select [ngModel]="sortDirection" (ngModelChange)="onSortDirectionChange($event)">
       <option value="asc">По возрастанию</option>
       <option value="desc">По убыванию</option>
     </select>
