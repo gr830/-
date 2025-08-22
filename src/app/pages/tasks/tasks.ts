@@ -193,7 +193,7 @@ export class Tasks implements OnInit, OnDestroy {
     this.clearAutoRefresh();
     if (this.selectedRefresh > 0) {
       this.refreshTimer = setInterval(() => {
-        this.fetchTasks();
+        this.fetchTasks(true);
       }, this.selectedRefresh * 60 * 1000);
     }
   }
@@ -337,7 +337,12 @@ export class Tasks implements OnInit, OnDestroy {
     return `${yyyy}-${MM}-${dd}T${HH}:${mm}:${ss}${tz}`;
   }
 
-  fetchTasks() {
+  fetchTasks(forceTodayFilter: boolean = false) {
+    if (forceTodayFilter) {
+      const todayStr = this.formatDateForInput(new Date());
+      this.deadlineFrom = todayStr;
+      this.deadlineTo = todayStr;
+    }
     this.loading = true;
     this.error = '';
     const start = (this.page - 1) * PAGE_SIZE;
