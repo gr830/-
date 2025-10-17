@@ -9,6 +9,12 @@
     </select>
   </label>
   <label>
+    Отдел:
+    <select [ngModel]="selectedGroup" (ngModelChange)="onGroupChange($event)">
+      <option *ngFor="let group of groupList" [value]="group.value">{{ group.label }}</option>
+    </select>
+  </label>
+  <label>
     Исполнитель:
     <select [ngModel]="selectedResponsible" (ngModelChange)="onResponsibleChange($event)">
       <option *ngFor="let r of responsibleList" [value]="r.value">{{ r.label }}</option>
