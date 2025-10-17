@@ -33,6 +33,11 @@ const REFRESH_INTERVALS = [
   { value: 60, label: 'Каждый час' },
 ];
 
+const GROUP_LIST = [
+  { value: 174, label: 'Отдел технологов' },
+  { value: 224, label: 'Инструментальный отдел' }, 
+];
+
 const PAGE_SIZE = 50;
 
 @Component({
@@ -70,6 +75,9 @@ export class Tasks implements OnInit, OnDestroy {
   selectedResponsible = 0;
   private responsibleIdToName: Record<number, string> = {};
   showScrollDown = false;
+  // Фильтр по группе
+  groupList = GROUP_LIST;
+  selectedGroup = 174; // По умолчанию Отдел технологов
 
   constructor(private router: Router) {}
 
@@ -296,6 +304,12 @@ export class Tasks implements OnInit, OnDestroy {
     this.fetchTasks();
   }
 
+  onGroupChange(value: any) {
+    this.selectedGroup = Number(value);
+    this.page = 1;
+    this.fetchTasks();
+  }
+
   onDeadlineFromChange(event: any) {
     this.deadlineFrom = event.target.value;
     this.page = 1;
@@ -359,7 +373,7 @@ export class Tasks implements OnInit, OnDestroy {
     const baseUrl = 'https://grosver-group.bitrix24.by/rest/196/gh4cf21vcpwrgub8/tasks.task.list';
     const url = new URL(baseUrl);
     const params = new URLSearchParams();
-    params.set('filter[GROUP_ID]', '174');
+    params.set('filter[GROUP_ID]', String(this.selectedGroup));
     params.set('start', String(start));
 
     if (this.selectedStatus !== 0) {
