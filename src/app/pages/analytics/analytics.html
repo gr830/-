@@ -1,0 +1,32 @@
+<h2>Аналитика задач для группы "План работ технологов"</h2>
+
+<div class="analytics-container">
+  <button (click)="goBack()" class="back-button">Назад на главную</button>
+
+  <div *ngIf="loading">
+    <p>Загрузка аналитики...</p>
+  </div>
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <div *ngIf="totalHoursAllTasks > 0; else noTasks">
+      <div class="analytics-item">
+        <p><strong>Общее расчетное время (задачи в ожидании и в работе):</strong> {{ totalHoursAllTasks | number:'1.2-2' }}</p>
+      </div>
+      <div class="analytics-item">
+        <p><strong>Общее расчетное время (Фрезерные операции - "фр."):</strong> {{ totalHoursMilling | number:'1.2-2' }}</p>
+      </div>
+      <div class="analytics-item">
+        <p><strong>Общее расчетное время (Токарные операции - "ток."):</strong> {{ totalHoursTurning | number:'1.2-2' }}</p>
+      </div>
+      <div class="analytics-item">
+        <p><strong>Общее расчетное время (Другие задачи):</strong> {{ totalHoursOtherTasks - totalHoursMilling - totalHoursTurning | number:'1.2-2' }}</p>
+      </div>
+    </div>
+    <ng-template #noTasks>
+      <p class="no-tasks-message">Задачи по заданным критериям не найдены.</p>
+    </ng-template>
+  </div>
+</div>

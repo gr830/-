@@ -462,4 +462,8 @@ export class Tasks implements OnInit, OnDestroy {
   goToSearch() {
     this.router.navigate(['/search']);
   }
+
+  goToAnalytics() {
+    this.router.navigate(['/analytics']);
+  }
 }
