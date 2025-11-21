@@ -13,16 +13,24 @@
   <div *ngIf="!loading && !error">
     <div *ngIf="totalHoursAllTasks > 0; else noTasks">
       <div class="analytics-item">
-        <p><strong>Общее расчетное время (задачи в ожидании и в работе):</strong> {{ totalHoursAllTasks | number:'1.2-2' }}</p>
+        <p><strong>Общая загрузка отдела (задачи в ожидании и в работе) </strong> </p>
+        <p><strong>Часов:</strong> {{ totalHoursAllTasks | number:'1.2-2' }} ч.</p>
+        <p><strong>Дней:</strong> {{ totalDaysAllTasks }} д. <span *ngIf="remainingHoursAllTasks > 0">{{ remainingHoursAllTasks | number:'1.0-0' }} ч.</span></p>
       </div>
       <div class="analytics-item">
-        <p><strong>Общее расчетное время (Фрезерные операции - "фр."):</strong> {{ totalHoursMilling | number:'1.2-2' }}</p>
+        <p><strong>Общее расчетное время (Фрезерные операции - "фр.") </strong> </p>
+        <p><strong>Часов:</strong> {{ totalHoursMilling | number:'1.2-2' }} ч.</p>
+        <p><strong>Дней:</strong> {{ totalDaysMilling }} д. <span *ngIf="remainingHoursMilling > 0">{{ remainingHoursMilling | number:'1.0-0' }} ч.</span></p>
       </div>
       <div class="analytics-item">
-        <p><strong>Общее расчетное время (Токарные операции - "ток."):</strong> {{ totalHoursTurning | number:'1.2-2' }}</p>
+        <p><strong>Общее расчетное время (Токарные операции - "ток.") </strong> </p>
+        <p><strong>Часов:</strong> {{ totalHoursTurning | number:'1.2-2' }} ч.</p>
+        <p><strong>Дней:</strong> {{ totalDaysTurning }} д. <span *ngIf="remainingHoursTurning > 0">{{ remainingHoursTurning | number:'1.0-0' }} ч.</span></p>
       </div>
       <div class="analytics-item">
-        <p><strong>Общее расчетное время (Другие задачи):</strong> {{ totalHoursOtherTasks - totalHoursMilling - totalHoursTurning | number:'1.2-2' }}</p>
+        <p><strong>Общее расчетное время (Другие задачи) </strong> </p>
+        <p><strong>Часов:</strong> {{ totalHoursOtherTasks - totalHoursMilling - totalHoursTurning | number:'1.2-2' }} ч.</p>
+        <p><strong>Дней:</strong> {{ totalDaysOtherTasks }} д. <span *ngIf="remainingHoursOtherTasks > 0">{{ remainingHoursOtherTasks | number:'1.0-0' }} ч.</span></p>
       </div>
     </div>
     <ng-template #noTasks>
