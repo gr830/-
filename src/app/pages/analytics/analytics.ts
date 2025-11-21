@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms'; // Import FormsModule
 
 interface Task {
   id: string;
@@ -21,7 +22,7 @@ interface TasksResponse {
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './analytics.html',
   styleUrl: './analytics.css'
 })
@@ -31,6 +32,9 @@ export class AnalyticsComponent implements OnInit {
   totalHoursTurning: number = 0;
   totalHoursOtherTasks: number = 0; // New property for other tasks
 
+  numberOfMillingTechnologists: number = 0; // Default to 1
+  numberOfTurningTechnologists: number = 0; // Default to 1
+
   totalDaysAllTasks: number = 0;
   remainingHoursAllTasks: number = 0;
   totalDaysMilling: number = 0;
@@ -39,6 +43,11 @@ export class AnalyticsComponent implements OnInit {
   remainingHoursTurning: number = 0;
   totalDaysOtherTasks: number = 0;
   remainingHoursOtherTasks: number = 0;
+
+  displayedHoursAllTasks: number = 0;
+  displayedHoursMilling: number = 0;
+  displayedHoursTurning: number = 0;
+  displayedHoursOtherTasks: number = 0;
 
   loading: boolean = true;
   error: string | null = null;
@@ -57,30 +66,46 @@ export class AnalyticsComponent implements OnInit {
     this.router.navigate(['/tasks']);
   }
 
+  updateAnalytics(): void {
+    this.calculateDisplayValues();
+  }
+
   private calculateDisplayValues(): void {
     const hoursPerDayFactor = 3; // x * 3
     const totalHoursInDay = 24; // divide by 24 hours
 
-    const calculateTime = (hours: number) => {
+    // Helper function to calculate days and remaining hours from a given number of hours
+    const calculateDaysAndHours = (hours: number) => {
       const totalAdjustedHours = hours * hoursPerDayFactor;
       const days = Math.floor(totalAdjustedHours / totalHoursInDay);
       const remainingHours = totalAdjustedHours % totalHoursInDay;
       return { days, remainingHours };
     };
 
-    const allTasksTime = calculateTime(this.totalHoursAllTasks);
+    // Calculate displayed hours based on technologists
+    const millingTechnologists = this.numberOfMillingTechnologists > 0 ? this.numberOfMillingTechnologists : 1;
+    const turningTechnologists = this.numberOfTurningTechnologists > 0 ? this.numberOfTurningTechnologists : 1;
+    const totalTechnologists = millingTechnologists + turningTechnologists;
+
+    this.displayedHoursMilling = this.totalHoursMilling / millingTechnologists;
+    this.displayedHoursTurning = this.totalHoursTurning / turningTechnologists;
+    this.displayedHoursOtherTasks = (this.totalHoursOtherTasks - this.totalHoursMilling - this.totalHoursTurning) / totalTechnologists;
+    this.displayedHoursAllTasks = this.displayedHoursMilling + this.displayedHoursTurning + this.displayedHoursOtherTasks;
+
+    // Calculate days and remaining hours for each category
+    const allTasksTime = calculateDaysAndHours(this.displayedHoursAllTasks);
     this.totalDaysAllTasks = allTasksTime.days;
     this.remainingHoursAllTasks = allTasksTime.remainingHours;
 
-    const millingTime = calculateTime(this.totalHoursMilling);
+    const millingTime = calculateDaysAndHours(this.displayedHoursMilling);
     this.totalDaysMilling = millingTime.days;
     this.remainingHoursMilling = millingTime.remainingHours;
 
-    const turningTime = calculateTime(this.totalHoursTurning);
+    const turningTime = calculateDaysAndHours(this.displayedHoursTurning);
     this.totalDaysTurning = turningTime.days;
     this.remainingHoursTurning = turningTime.remainingHours;
 
-    const otherTasksTime = calculateTime(this.totalHoursOtherTasks - this.totalHoursMilling - this.totalHoursTurning);
+    const otherTasksTime = calculateDaysAndHours(this.displayedHoursOtherTasks);
     this.totalDaysOtherTasks = otherTasksTime.days;
     this.remainingHoursOtherTasks = otherTasksTime.remainingHours;
   }
@@ -194,7 +219,7 @@ export class AnalyticsComponent implements OnInit {
     this.totalHoursMilling = totalMilling;
     this.totalHoursTurning = totalTurning;
     this.totalHoursOtherTasks = totalOther; // Assign calculated other tasks total
-    this.calculateDisplayValues(); // Calculate and display days/hours after initial load
+    this.updateAnalytics(); // Calculate and display days/hours after initial load
     console.log('processTasks: Calculated totals:', {
       totalHoursAllTasks: this.totalHoursAllTasks,
       totalHoursMilling: this.totalHoursMilling,
