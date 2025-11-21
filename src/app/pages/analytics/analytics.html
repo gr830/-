@@ -18,17 +18,17 @@
         <p><strong>Дней:</strong> {{ totalDaysAllTasks }} д. <span *ngIf="remainingHoursAllTasks > 0">{{ remainingHoursAllTasks | number:'1.0-0' }} ч.</span></p>
       </div>
       <div class="analytics-item">
-        <p><strong>Общее расчетное время (Фрезерные операции - "фр.") </strong> </p>
+        <p><strong>Загрузка по фрезерным операциям ("фр.") </strong> </p>
         <p><strong>Часов:</strong> {{ totalHoursMilling | number:'1.2-2' }} ч.</p>
         <p><strong>Дней:</strong> {{ totalDaysMilling }} д. <span *ngIf="remainingHoursMilling > 0">{{ remainingHoursMilling | number:'1.0-0' }} ч.</span></p>
       </div>
       <div class="analytics-item">
-        <p><strong>Общее расчетное время (Токарные операции - "ток.") </strong> </p>
+        <p><strong>Загрузка по токарным операциям ("ток.") </strong> </p>
         <p><strong>Часов:</strong> {{ totalHoursTurning | number:'1.2-2' }} ч.</p>
         <p><strong>Дней:</strong> {{ totalDaysTurning }} д. <span *ngIf="remainingHoursTurning > 0">{{ remainingHoursTurning | number:'1.0-0' }} ч.</span></p>
       </div>
       <div class="analytics-item">
-        <p><strong>Общее расчетное время (Другие задачи) </strong> </p>
+        <p><strong>Загрузка по другим задачам (написание структур, тех процессов и т.д.) </strong> </p>
         <p><strong>Часов:</strong> {{ totalHoursOtherTasks - totalHoursMilling - totalHoursTurning | number:'1.2-2' }} ч.</p>
         <p><strong>Дней:</strong> {{ totalDaysOtherTasks }} д. <span *ngIf="remainingHoursOtherTasks > 0">{{ remainingHoursOtherTasks | number:'1.0-0' }} ч.</span></p>
       </div>
