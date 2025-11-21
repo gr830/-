@@ -25,7 +25,8 @@ h2 {
   border-radius: 16px;
   box-shadow: 0 8px 32px 0 rgba(23, 158, 220, 0.13);
   padding: 2rem;
-  max-width: 800px;
+  max-width: 90%; /* Adjusted for better responsiveness */
+  width: 100%; /* Ensure it takes full available width up to max-width */
   margin: 2rem auto;
   border: 1.5px solid #50c878;
   text-align: center;
@@ -43,41 +44,146 @@ h2 {
 .analytics-item:hover {
   transform: translateY(-2px);
 }
-.analytics-item strong {
-  color: #179edc;
-}
-.error-message {
-  color: #e74c3c;
-  font-size: 1.1rem;
-  text-align: center;
-  margin-bottom: 1rem;
-  animation: shake 0.3s;
-}
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-  100% { transform: translateX(0); }
-}
-.no-tasks-message {
-  font-size: 1.2rem;
-  color: #555;
-  margin-top: 2rem;
-}
 
-.back-button {
-  background: linear-gradient(90deg, #50c878 0%, #179edc 100%);
+.chart-toggle-button {
+  background: linear-gradient(90deg, #f06d06 0%, #ffbb00 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
   padding: 0.6rem 1.2rem;
   font-size: 1rem;
   font-weight: 600;
-  margin: 1rem 0 1rem 0;
+  margin-bottom: 1.5rem;
   cursor: pointer;
-  box-shadow: 0 2px 8px 0 #179edc22;
+  box-shadow: 0 2px 8px 0 rgba(240, 109, 6, 0.2);
   transition: background 0.3s, transform 0.2s;
+}
+
+.chart-toggle-button:hover {
+  background: linear-gradient(90deg, #ffbb00 0%, #f06d06 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.pie-chart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  min-height: 250px; /* Ensure sufficient height for the pie chart and legend */
+}
+
+.pie-chart {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background-color: #eee;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.pie-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  max-width: 100%;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+
+.analytics-content-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2rem;
+  align-items: flex-start;
+}
+
+.chart-section {
+  flex: 1 1 45%;
+  min-width: 280px; /* Adjusted min-width for better mobile scaling */
+  background: rgba(255,255,255,0.9);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px 0 rgba(23, 158, 220, 0.08);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.chart-section h3 {
+  font-size: 1.5rem;
+  color: #179edc;
+  margin-bottom: 1.5rem;
+}
+
+.data-section {
+  flex: 1 1 45%;
+  min-width: 280px; /* Adjusted min-width for better mobile scaling */
+}
+
+.custom-chart.bar-chart {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Adjusted gap between bars */
+}
+
+.chart-bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  position: relative;
+}
+
+.chart-bar {
+  height: 30px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  transition: width 0.5s ease-out;
+  justify-content: flex-end;
+  padding-right: 0.5rem;
+  box-sizing: border-box;
+  width: var(--bar-width, 0%); /* Use CSS variable for width */
+  margin: 5px; /* Remove margin */
+  min-width: 60px; /* Allow bar to go to 0 width */
+}
+
+.bar-label {
+  position: static;
+  transform: none;
+  margin-top: 0.5rem;
+  color: #333;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: normal; /* Allow text to wrap */
+  text-align: left;
+  padding-right: 0;
+  word-break: break-word; /* Break long words */
+}
+
+.bar-value {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 .back-button:hover {
@@ -134,3 +240,60 @@ h2 {
   transform: translateY(-2px) scale(1.03);
   box-shadow: 0 6px 16px 0 rgba(23, 158, 220, 0.3);
 }
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .analytics-content-wrapper {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 767px) {
+  .analytics-content-wrapper {
+    flex-direction: column;
+  }
+
+  .chart-section {
+    order: 2;
+    align-items: flex-start; /* Align chart section content to the left on mobile */
+  }
+
+  .data-section {
+    order: 1;
+    margin-bottom: 2rem;
+  }
+
+  .chart-bar-container {
+    align-items: center; /* Align bar containers to the left on mobile */
+    flex-direction: row; /* Make bar and label/value inline */
+    height: auto; /* Allow height to adjust */
+    gap: 0.5rem; /* Space between label and bar */
+  }
+
+  .chart-bar {
+    height: 30px;
+    width: var(--bar-width, 0%) !important; /* Ensure width is respected */
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .bar-label {
+    position: static;
+    transform: none;
+    margin-top: 0;
+    margin-right: 0.5rem; /* Space between label and bar */
+    text-align: left;
+    max-width: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bar-value {
+    position: static;
+    margin-left: auto;
+    color: #333;
+  }
+}
+

@@ -49,6 +49,9 @@ export class AnalyticsComponent implements OnInit {
   displayedHoursTurning: number = 0;
   displayedHoursOtherTasks: number = 0;
 
+  chartData: { label: string, value: number, color: string }[] = []; // Re-add chartData
+  chartType: 'bar' | 'pie' = 'bar'; // New property to toggle chart type
+
   loading: boolean = true;
   error: string | null = null;
 
@@ -68,6 +71,7 @@ export class AnalyticsComponent implements OnInit {
 
   updateAnalytics(): void {
     this.calculateDisplayValues();
+    this.updateChartData(); // Re-add chart data update
   }
 
   private calculateDisplayValues(): void {
@@ -112,6 +116,55 @@ export class AnalyticsComponent implements OnInit {
     const otherTasksTime = calculateDaysAndHours(this.displayedHoursOtherTasks);
     this.totalDaysOtherTasks = otherTasksTime.days;
     this.remainingHoursOtherTasks = otherTasksTime.remainingHours;
+  }
+
+  getMaxChartValue(): number {
+    if (this.chartData.length === 0) {
+      return 0;
+    }
+    return Math.max(...this.chartData.map(item => item.value));
+  }
+
+  private updateChartData(): void {
+    this.chartData = [
+      { label: 'Общее время', value: this.displayedHoursAllTasks, color: '#179edc' },
+      { label: 'Фрезерные операции', value: this.displayedHoursMilling, color: '#50c878' },
+      { label: 'Токарные операции', value: this.displayedHoursTurning, color: '#FFD700' },
+      { label: 'Другие задачи', value: this.displayedHoursOtherTasks, color: '#FF6347' }
+    ];
+  }
+
+  toggleChartType(): void {
+    this.chartType = this.chartType === 'bar' ? 'pie' : 'bar';
+  }
+
+  getPieChartStyle(): string {
+    const total = this.chartData.reduce((sum, item) => sum + item.value, 0);
+    if (total === 0) {
+      return 'background-image: conic-gradient(#eee 0% 100%);'; // Grey circle if no data
+    }
+
+    let gradientString = 'conic-gradient(';
+    let currentAngle = 0;
+
+    this.chartData.forEach((item, index) => {
+      const percentage = item.value / total;
+      const angle = percentage * 360;
+      
+      const startAngle = currentAngle;
+      const endAngle = currentAngle + angle;
+
+      gradientString += `${item.color} ${startAngle}deg ${endAngle}deg${index < this.chartData.length - 1 ? ', ' : ''}`;
+      currentAngle = endAngle;
+    });
+
+    // Ensure the last slice completes the circle in case of floating point inaccuracies
+    if (currentAngle < 360) {
+      gradientString += `, #eee ${currentAngle}deg 360deg`; // Fill remaining with a neutral color
+    }
+
+    gradientString += ');';
+    return `background-image: ${gradientString}`;
   }
 
   private async fetchFilteredTasks(titleFilter: string | null = null): Promise<Task[]> {

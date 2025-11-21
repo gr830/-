@@ -1,7 +1,7 @@
 <h2>Аналитика задач для группы "План работ технологов"</h2>
 
 <div class="analytics-container">
-  <button (click)="goBack()" class="back-button">Назад на главную</button>
+  <button (click)="goBack()" class="update-button">Назад на главную</button>
 
   <div *ngIf="loading">
     <p>Загрузка аналитики...</p>
@@ -10,42 +10,68 @@
     <p>{{ error }}</p>
   </div>
 
-  <div *ngIf="!loading && !error">
-    <div class="input-group">
-      <label for="millingTechnologists">Количество фрезерных технологов:</label>
-      <input type="number" id="millingTechnologists" [(ngModel)]="numberOfMillingTechnologists" min="0" value="0">
-    </div>
-    <div class="input-group">
-      <label for="turningTechnologists">Количество токарных технологов:</label>
-      <input type="number" id="turningTechnologists" [(ngModel)]="numberOfTurningTechnologists" min="0" value="0">
-    </div>
-    <button (click)="updateAnalytics()" class="update-button">Рассчитать</button>
-    <button (click)="loadAllTasks()" class="refresh-button">Обновить</button>
+  <div *ngIf="!loading && !error" class="analytics-content-wrapper">
+    <div class="chart-section">
+      <h3>Распределение часов по категориям</h3>
+      
 
-    <div *ngIf="displayedHoursAllTasks > 0; else noTasks">
-      <div class="analytics-item">
-        <p><strong>Общая загрузка отдела (задачи в ожидании и в работе) </strong> </p>
-        <p><strong>Часов:</strong> {{ displayedHoursAllTasks | number:'1.2-2' }} ч.</p>
-        <p><strong>Дней:</strong> {{ totalDaysAllTasks }} д. <span *ngIf="remainingHoursAllTasks > 0">{{ remainingHoursAllTasks | number:'1.0-0' }} ч.</span></p>
+      <div *ngIf="chartType === 'bar'" class="custom-chart bar-chart">
+        <div *ngFor="let item of chartData" class="chart-bar-container">
+          <div class="chart-bar" [style.--bar-width.%]="(item.value / getMaxChartValue()) * 100" [style.background-color]="item.color">
+            <span class="bar-value">{{ item.value | number:'1.2-2' }} ч.</span>
+          </div>
+          <span class="bar-label">{{ item.label }}</span>
+        </div>
       </div>
-      <div class="analytics-item">
-        <p><strong>Загрузка по фрезерным операциям ("фр.") </strong> </p>
-        <p><strong>Часов:</strong> {{ displayedHoursMilling | number:'1.2-2' }} ч.</p>
-        <p><strong>Дней:</strong> {{ totalDaysMilling }} д. <span *ngIf="remainingHoursMilling > 0">{{ remainingHoursMilling | number:'1.0-0' }} ч.</span></p>
-      </div>
-      <div class="analytics-item">
-        <p><strong>Загрузка по токарным операциям ("ток.") </strong> </p>
-        <p><strong>Часов:</strong> {{ displayedHoursTurning | number:'1.2-2' }} ч.</p>
-        <p><strong>Дней:</strong> {{ totalDaysTurning }} д. <span *ngIf="remainingHoursTurning > 0">{{ remainingHoursTurning | number:'1.0-0' }} ч.</span></p>
-      </div>
-      <div class="analytics-item">
-        <p><strong>Загрузка по другим задачам (написание структур, тех процессов и т.д.) </strong> </p>
-        <p><strong>Часов:</strong> {{ displayedHoursOtherTasks | number:'1.2-2' }} ч.</p>
-        <p><strong>Дней:</strong> {{ totalDaysOtherTasks }} д. <span *ngIf="remainingHoursOtherTasks > 0">{{ remainingHoursOtherTasks | number:'1.0-0' }} ч.</span></p>
+
+      <div *ngIf="chartType === 'pie'" class="custom-chart pie-chart-container">
+        <div class="pie-chart" [style.background-image]="getPieChartStyle()"></div>
+        <div class="pie-legend">
+          <div *ngFor="let item of chartData" class="legend-item">
+            <span class="legend-color" [style.background-color]="item.color"></span>
+            <span class="legend-label">{{ item.label }} ({{ item.value | number:'1.2-2' }} ч.)</span>
+          </div>
+        </div>
       </div>
     </div>
-    <ng-template #noTasks>
-      <p class="no-tasks-message">Задачи по заданным критериям не найдены.</p>
-    </ng-template>
+
+    <div class="data-section">
+      <div class="input-group">
+        <label for="millingTechnologists">Количество фрезерных технологов:</label>
+        <input type="number" id="millingTechnologists" [(ngModel)]="numberOfMillingTechnologists" min="0" value="0">
+      </div>
+      <div class="input-group">
+        <label for="turningTechnologists">Количество токарных технологов:</label>
+        <input type="number" id="turningTechnologists" [(ngModel)]="numberOfTurningTechnologists" min="0" value="0">
+      </div>
+      <button (click)="updateAnalytics()" class="update-button">Рассчитать</button>
+      <button (click)="loadAllTasks()" class="refresh-button">Обновить</button>
+
+      <div *ngIf="displayedHoursAllTasks > 0; else noTasks">
+        <div class="analytics-item">
+          <p><strong>Общая загрузка отдела (задачи в ожидании и в работе) </strong> </p>
+          <p><strong>Часов:</strong> {{ displayedHoursAllTasks | number:'1.2-2' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysAllTasks }} д. <span *ngIf="remainingHoursAllTasks > 0">{{ remainingHoursAllTasks | number:'1.0-0' }} ч.</span></p>
+        </div>
+        <div class="analytics-item">
+          <p><strong>Загрузка по фрезерным операциям ("фр.") </strong> </p>
+          <p><strong>Часов:</strong> {{ displayedHoursMilling | number:'1.2-2' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysMilling }} д. <span *ngIf="remainingHoursMilling > 0">{{ remainingHoursMilling | number:'1.0-0' }} ч.</span></p>
+        </div>
+        <div class="analytics-item">
+          <p><strong>Загрузка по токарным операциям ("ток.") </strong> </p>
+          <p><strong>Часов:</strong> {{ displayedHoursTurning | number:'1.2-2' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysTurning }} д. <span *ngIf="remainingHoursTurning > 0">{{ remainingHoursTurning | number:'1.0-0' }} ч.</span></p>
+        </div>
+        <div class="analytics-item">
+          <p><strong>Загрузка по другим задачам (написание структур, тех процессов и т.д.) </strong> </p>
+          <p><strong>Часов:</strong> {{ displayedHoursOtherTasks | number:'1.2-2' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysOtherTasks }} д. <span *ngIf="remainingHoursOtherTasks > 0">{{ remainingHoursOtherTasks | number:'1.0-0' }} ч.</span></p>
+        </div>
+      </div>
+      <ng-template #noTasks>
+        <p class="no-tasks-message">Задачи по заданным критериям не найдены.</p>
+      </ng-template>
+    </div>
   </div>
 </div>
