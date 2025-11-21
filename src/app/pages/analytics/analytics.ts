@@ -32,8 +32,8 @@ export class AnalyticsComponent implements OnInit {
   totalHoursTurning: number = 0;
   totalHoursOtherTasks: number = 0; // New property for other tasks
 
-  numberOfMillingTechnologists: number = 0; // Default to 1
-  numberOfTurningTechnologists: number = 0; // Default to 1
+  numberOfMillingTechnologists: number = 0; // Default to 0
+  numberOfTurningTechnologists: number = 0; // Default to 0
 
   totalDaysAllTasks: number = 0;
   remainingHoursAllTasks: number = 0;
@@ -82,14 +82,18 @@ export class AnalyticsComponent implements OnInit {
       return { days, remainingHours };
     };
 
-    // Calculate displayed hours based on technologists
+    // Ensure technologists are at least 1 for division to avoid NaN or Infinity
     const millingTechnologists = this.numberOfMillingTechnologists > 0 ? this.numberOfMillingTechnologists : 1;
     const turningTechnologists = this.numberOfTurningTechnologists > 0 ? this.numberOfTurningTechnologists : 1;
-    const totalTechnologists = millingTechnologists + turningTechnologists;
+    const totalTechnologistsForOther = (this.numberOfMillingTechnologists + this.numberOfTurningTechnologists) > 0 ? (this.numberOfMillingTechnologists + this.numberOfTurningTechnologists) : 1;
 
+    // Calculate displayed hours based on technologists
     this.displayedHoursMilling = this.totalHoursMilling / millingTechnologists;
     this.displayedHoursTurning = this.totalHoursTurning / turningTechnologists;
-    this.displayedHoursOtherTasks = (this.totalHoursOtherTasks - this.totalHoursMilling - this.totalHoursTurning) / totalTechnologists;
+    // Calculate 'other tasks' hours directly from the original total and then divide
+    const rawOtherTasksHours = this.totalHoursOtherTasks - this.totalHoursMilling - this.totalHoursTurning;
+    this.displayedHoursOtherTasks = rawOtherTasksHours / totalTechnologistsForOther;
+    
     this.displayedHoursAllTasks = this.displayedHoursMilling + this.displayedHoursTurning + this.displayedHoursOtherTasks;
 
     // Calculate days and remaining hours for each category
@@ -195,24 +199,24 @@ export class AnalyticsComponent implements OnInit {
 
     for (const task of allTasks) {
       const duration = parseFloat(task.durationPlan || '0');
-      totalAll += duration;
+      totalAll += isNaN(duration) ? 0 : duration;
 
       const taskTitle = task.title || task.TITLE || ''; // Ensure taskTitle is always a string
       const lowerCaseTitle = taskTitle.toLowerCase();
 
       if (!lowerCaseTitle.includes('фр.') && !lowerCaseTitle.includes('ток.')) {
-        totalOther += duration;
+        totalOther += isNaN(duration) ? 0 : duration;
       }
     }
 
     for (const task of millingTasks) {
       const duration = parseFloat(task.durationPlan || '0');
-      totalMilling += duration;
+      totalMilling += isNaN(duration) ? 0 : duration;
     }
 
     for (const task of turningTasks) {
       const duration = parseFloat(task.durationPlan || '0');
-      totalTurning += duration;
+      totalTurning += isNaN(duration) ? 0 : duration;
     }
 
     this.totalHoursAllTasks = totalAll;
