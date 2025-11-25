@@ -36,6 +36,7 @@ const REFRESH_INTERVALS = [
 const GROUP_LIST = [
   { value: 174, label: 'Отдел технологов' },
   { value: 224, label: 'Инструментальный отдел' }, 
+  { value: 226, label: 'План работы цеха' }, 
 ];
 
 const PAGE_SIZE = 50;
