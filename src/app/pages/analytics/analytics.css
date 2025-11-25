@@ -264,36 +264,36 @@ h2 {
   }
 
   .chart-bar-container {
-    align-items: center; /* Align bar containers to the left on mobile */
-    flex-direction: row; /* Make bar and label/value inline */
+    align-items: flex-start; /* Align bar containers to the left on mobile */
+    flex-direction: column; /* Stack bar and label/value vertically */
     height: auto; /* Allow height to adjust */
-    gap: 0.5rem; /* Space between label and bar */
+    gap: 0.2rem; /* Reduced space between bar and label */
   }
 
   .chart-bar {
     height: 30px;
     width: var(--bar-width, 0%) !important; /* Ensure width is respected */
-    justify-content: flex-end;
-    padding-right: 0.5rem;
+    justify-content: center; /* Center the value within the bar */
+    padding-right: 0; /* Remove right padding */
     flex-shrink: 0;
   }
 
   .bar-label {
     position: static;
     transform: none;
-    margin-top: 0;
-    margin-right: 0.5rem; /* Space between label and bar */
-    text-align: left;
-    max-width: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-top: 0.5rem; /* Space between bar and label */
+    margin-right: 0; /* Remove right margin */
+    text-align: center; /* Center the label below the bar */
+    max-width: 100%; /* Allow label to take full width */
+    white-space: normal; /* Allow text to wrap */
+    overflow: visible; /* Ensure full text is visible */
+    text-overflow: clip;
   }
 
   .bar-value {
     position: static;
-    margin-left: auto;
-    color: #333;
+    margin-left: 0; /* Remove auto margin */
+    color: #ffffff; /* Keep color white for visibility inside bar */
   }
 }
 
