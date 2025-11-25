@@ -18,7 +18,7 @@
       <div *ngIf="chartType === 'bar'" class="custom-chart bar-chart">
         <div *ngFor="let item of chartData" class="chart-bar-container">
           <div class="chart-bar" [style.--bar-width.%]="(item.value / getMaxChartValue()) * 100" [style.background-color]="item.color">
-            <span class="bar-value">{{ item.value | number:'1.2-2' }} ч.</span>
+            <span class="bar-value">{{ item.value * 1.2 | number:'1.0-0' }} ч.</span>
           </div>
           <span class="bar-label">{{ item.label }}</span>
         </div>
@@ -29,7 +29,7 @@
         <div class="pie-legend">
           <div *ngFor="let item of chartData" class="legend-item">
             <span class="legend-color" [style.background-color]="item.color"></span>
-            <span class="legend-label">{{ item.label }} ({{ item.value | number:'1.2-2' }} ч.)</span>
+            <span class="legend-label">{{ item.label }} ({{ item.value * 1.2 | number:'1.0-0' }} ч.)</span>
           </div>
         </div>
       </div>
@@ -50,23 +50,23 @@
       <div *ngIf="displayedHoursAllTasks > 0; else noTasks">
         <div class="analytics-item">
           <p><strong>Общая загрузка отдела (задачи в ожидании и в работе) </strong> </p>
-          <p><strong>Часов:</strong> {{ displayedHoursAllTasks | number:'1.2-2' }} ч.</p>
-          <p><strong>Дней:</strong> {{ totalDaysAllTasks }} д. <span *ngIf="remainingHoursAllTasks > 0">{{ remainingHoursAllTasks | number:'1.0-0' }} ч.</span></p>
+          <p><strong>Часов:</strong> {{ displayedHoursAllTasks * 1.2| number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysAllTasks * 1.2 | ceil | number:'1.0-0' }} д. </p>
         </div>
         <div class="analytics-item">
           <p><strong>Загрузка по фрезерным операциям ("фр.") </strong> </p>
-          <p><strong>Часов:</strong> {{ displayedHoursMilling | number:'1.2-2' }} ч.</p>
-          <p><strong>Дней:</strong> {{ totalDaysMilling }} д. <span *ngIf="remainingHoursMilling > 0">{{ remainingHoursMilling | number:'1.0-0' }} ч.</span></p>
+          <p><strong>Часов:</strong> {{ displayedHoursMilling * 1.2 | number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysMilling *1.2  | ceil | number:'1.0-0' }} д. </p>
         </div>
         <div class="analytics-item">
           <p><strong>Загрузка по токарным операциям ("ток.") </strong> </p>
-          <p><strong>Часов:</strong> {{ displayedHoursTurning | number:'1.2-2' }} ч.</p>
-          <p><strong>Дней:</strong> {{ totalDaysTurning }} д. <span *ngIf="remainingHoursTurning > 0">{{ remainingHoursTurning | number:'1.0-0' }} ч.</span></p>
+          <p><strong>Часов:</strong> {{ displayedHoursTurning * 1.2 | number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysTurning * 1.2 | ceil | number:'1.0-0' }} д. </p>
         </div>
         <div class="analytics-item">
           <p><strong>Загрузка по другим задачам (написание структур, тех процессов и т.д.) </strong> </p>
-          <p><strong>Часов:</strong> {{ displayedHoursOtherTasks | number:'1.2-2' }} ч.</p>
-          <p><strong>Дней:</strong> {{ totalDaysOtherTasks }} д. <span *ngIf="remainingHoursOtherTasks > 0">{{ remainingHoursOtherTasks | number:'1.0-0' }} ч.</span></p>
+          <p><strong>Часов:</strong> {{ displayedHoursOtherTasks * 1.2 | number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysOtherTasks * 1.2 | ceil | number:'1.0-0'}} д. </p>
         </div>
       </div>
       <ng-template #noTasks>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms'; // Import FormsModule
+import { CeilPipe } from '../../pipe/seil';
 
 interface Task {
   id: string;
@@ -22,7 +23,7 @@ interface TasksResponse {
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CeilPipe],
   templateUrl: './analytics.html',
   styleUrl: './analytics.css'
 })

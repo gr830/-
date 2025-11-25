@@ -211,6 +211,7 @@ select:focus {
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
+  
   h2 {
     font-size: 1.6rem;
   }
