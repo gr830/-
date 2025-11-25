@@ -162,8 +162,8 @@ h2 {
   padding-right: 0.5rem;
   box-sizing: border-box;
   width: var(--bar-width, 0%); /* Use CSS variable for width */
-  margin: 5px; /* Remove margin */
-  min-width: 60px; /* Allow bar to go to 0 width */
+  margin: 0; /* Remove margin */
+  min-width: 0; /* Allow bar to go to 0 width */
 }
 
 .bar-label {
@@ -182,7 +182,7 @@ h2 {
 .bar-value {
   color: #ffffff;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.85rem;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
@@ -294,6 +294,61 @@ h2 {
     position: static;
     margin-left: auto;
     color: #333;
+  }
+}
+
+@media (max-width: 499px) {
+  .analytics-container {
+    padding: 1rem;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  .input-group input[type="number"] {
+    width: calc(100% - 10px);
+    padding: 0.6rem 5px;
+  }
+
+  .update-button,
+  .refresh-button {
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    margin: 0.5rem 0.2rem;
+  }
+
+  .chart-section {
+    min-width: auto;
+    padding: 1rem;
+  }
+
+  .data-section {
+    min-width: auto;
+  }
+
+  .pie-chart {
+    width: 160px;
+    height: 160px;
+  }
+
+  .pie-legend {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .chart-bar {
+    height: 25px;
+  }
+
+  .bar-value {
+    font-size: 0.75rem;
+  }
+
+  .bar-label {
+    font-size: 0.8rem;
+    white-space: normal;
+    word-break: break-word;
   }
 }
 
