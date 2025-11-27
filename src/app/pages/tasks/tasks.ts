@@ -199,9 +199,11 @@ export class Tasks implements OnInit, OnDestroy {
   }
 
   setupAutoRefresh() {
+    console.log(`[Tasks] setupAutoRefresh called. Current selectedRefresh: ${this.selectedRefresh}`);
     this.clearAutoRefresh();
     if (this.selectedRefresh > 0) {
       this.refreshTimer = setInterval(() => {
+        console.log('[Tasks] Auto-refreshing tasks...');
         // Принудительно ставим сортировку и текущую дату
         this.sortField = 'DEADLINE';
         this.sortDirection = 'asc';
@@ -210,17 +212,22 @@ export class Tasks implements OnInit, OnDestroy {
         this.deadlineTo = todayStr;
         this.fetchTasks();
       }, this.selectedRefresh * 60 * 1000);
+      console.log(`[Tasks] Auto-refresh timer set for ${this.selectedRefresh} minutes. Timer ID: ${this.refreshTimer}`);
+    } else {
+      console.log('[Tasks] Auto-refresh is disabled.');
     }
   }
 
   clearAutoRefresh() {
     if (this.refreshTimer) {
+      console.log(`[Tasks] Clearing auto-refresh timer with ID: ${this.refreshTimer}`);
       clearInterval(this.refreshTimer);
       this.refreshTimer = null;
     }
   }
 
   onRefreshChange(event: any) {
+    console.log(`[Tasks] onRefreshChange called. Event target value: ${event.target.value}`);
     this.selectedRefresh = +event.target.value;
     this.setupAutoRefresh();
   }
