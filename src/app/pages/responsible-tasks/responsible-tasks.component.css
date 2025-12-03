@@ -253,7 +253,7 @@ select:focus {
   display: block;
   color: #555;
   font-family: 'Roboto', sans-serif; /* Добавил шрифт */
-  font-size: 0.95rem; /* Скорректировал размер шрифта */
+  font-size: 1.1rem; /* Скорректировал размер шрифта */
   line-height: 1.4; /* Улучшил межстрочный интервал */
   margin-top: 0.4rem; /* Скорректировал отступ */
 }
