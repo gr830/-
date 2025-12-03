@@ -36,6 +36,7 @@
     <h3>{{ task.title }}</h3>
     <p><b>Статус:     </b> <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">{{ getStatusLabel(getTaskStatusValue(task)) }}</span></p>
     <p *ngIf="task.responsible"><b>Исполнитель:</b> {{ task.responsible.name }} </p>
+    <p *ngIf="task.durationPlan"><b>Продолжительность:</b> {{ task.durationPlan }} ч.</p>
     <p *ngIf="task.deadline"><b>Дедлайн:</b> {{ formatDeadline(task.deadline) }}</p>
   </div>
 </div>

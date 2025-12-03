@@ -99,6 +99,7 @@ export class SearchComponent implements OnInit {
     params.set('select[2]', 'STATUS');
     params.set('select[3]', 'RESPONSIBLE_ID');
     params.set('select[4]', 'DEADLINE');
+    params.set('select[5]', 'DURATION_PLAN');
     params.set('order[ID]', 'asc');
 
     // Параметры пагинации

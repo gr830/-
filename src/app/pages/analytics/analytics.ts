@@ -34,9 +34,9 @@ export class AnalyticsComponent implements OnInit {
   totalHoursOtherTasks: number = 0; // New property for other tasks
   totalHoursDevelopers: number = 0; // Corrected property name from totalHoursDevelopment
 
-  numberOfMillingTechnologists: number = 0; // Default to 0
-  numberOfTurningTechnologists: number = 0; // Default to 0
-  numberOfConstructors: number = 0; // New property for constructors
+  numberOfMillingTechnologists: number = 1; // Default to 0
+  numberOfTurningTechnologists: number = 1; // Default to 0
+  numberOfConstructors: number = 1; // New property for constructors
 
   totalDaysAllTasks: number = 0;
   remainingHoursAllTasks: number = 0;
