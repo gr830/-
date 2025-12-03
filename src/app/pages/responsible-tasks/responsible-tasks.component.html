@@ -1,0 +1,51 @@
+<div class="tasks-container">
+  <h2>Мини Гант</h2>
+
+  <div class="tasks-controls">
+    <label>
+      Исполнитель:
+      <select [ngModel]="selectedResponsible" (ngModelChange)="onResponsibleChange($event)">
+        <option *ngFor="let r of responsibleList" [value]="r.value">{{ r.label }}</option>
+      </select>
+    </label>
+    <ng-container *ngIf="selectedResponsibleIcon">
+      <img [src]="selectedResponsibleIcon" alt="Responsible Avatar" class="responsible-avatar" />
+    </ng-container>
+    <button (click)="generateResponsibleTasks()" [disabled]="selectedResponsible === 0">Сформировать</button>
+    <button (click)="goBack()">Назад к задачам</button>
+  </div>
+
+  <div *ngIf="loading">Загрузка задач...</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <div *ngIf="showTasksList && tasks.length > 0 && !loading && !error" class="responsible-tasks-container">
+    <div class="responsible-header">
+      <div class="avatar-wrapper">
+        <ng-container *ngIf="selectedResponsibleIcon; else initialsPlaceholder">
+          <img [src]="selectedResponsibleIcon" alt="Responsible Avatar" class="avatar-img" />
+        </ng-container>
+        <ng-template #initialsPlaceholder>
+          <div class="avatar-placeholder">{{ getInitials(getResponsibleName(selectedResponsible)) }}</div>
+        </ng-template>
+      </div>
+      <h3>{{ getResponsibleName(selectedResponsible) }}</h3>
+    </div>
+    <ul class="tasks-list-horizontal">
+      <ng-container *ngFor="let task of tasks; let i = index">
+        <li *ngIf="task.endDatePlan" class="task-item" [class.last-task-item]="i === tasks.length - 1">
+          <b>{{ task.title }}</b><br />
+          <span *ngIf="task.startDatePlan">Начало план: {{ formatDeadline(task.startDatePlan) }}</span><br *ngIf="task.startDatePlan"/>
+          <span>Завершение план: {{ formatDeadline(task.endDatePlan) }}</span><br />
+          <span *ngIf="task.durationPlan > 0">Время на выполнение: {{ task.durationPlan }} ч.</span><br />
+          <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">
+            {{ getStatusLabel(getTaskStatusValue(task)) }}
+          </span>
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+
+  <div *ngIf="showTasksList && tasks.length === 0 && !loading && !error" class="no-tasks-message">
+    Задачи для выбранного исполнителя не найдены.
+  </div>
+</div>

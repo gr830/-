@@ -3,6 +3,7 @@ import { Login } from './pages/login/login';
 import { Tasks } from './pages/tasks/tasks';
 import { SearchComponent } from './pages/search/search';
 import { AnalyticsComponent } from './pages/analytics/analytics';
+import { ResponsibleTasksComponent } from './pages/responsible-tasks/responsible-tasks.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -10,4 +11,5 @@ export const routes: Routes = [
   { path: 'tasks', component: Tasks },
   { path: 'search', component: SearchComponent },
   { path: 'analytics', component: AnalyticsComponent },
+  { path: 'responsible-tasks', component: ResponsibleTasksComponent },
 ];
