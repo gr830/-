@@ -8,9 +8,6 @@
         <option *ngFor="let r of responsibleList" [value]="r.value">{{ r.label }}</option>
       </select>
     </label>
-    <ng-container *ngIf="selectedResponsibleIcon">
-      <img [src]="selectedResponsibleIcon" alt="Responsible Avatar" class="responsible-avatar" />
-    </ng-container>
     <button (click)="generateResponsibleTasks()" [disabled]="selectedResponsible === 0">Сформировать</button>
     <button (click)="goBack()">Назад к задачам</button>
   </div>

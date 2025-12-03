@@ -264,29 +264,30 @@ select:focus {
 /* Adjustments for smaller screens */
 @media (max-width: 1024px) { /* Для планшетов */
   .tasks-list-horizontal {
-    flex-direction: column-reverse; /* Задачи снизу вверх */
+    flex-direction: column; /* Изменил на column для порядка от старых к новым (сверху вниз) */
     align-items: center; /* Центрируем элементы по горизонтали */
     gap: 60px; /* Увеличил gap для вертикального расположения */
     overflow-x: hidden; /* Отключаем горизонтальную прокрутку */
     overflow-y: auto; /* Включаем вертикальную прокрутку */
     height: auto; /* Позволяем высоте регулироваться по содержимому */
     padding-right: 0;
-    padding-bottom: 0;
-    padding-top: 10px; /* Добавил padding для скроллбара */
+    padding-bottom: 45px; /* Добавил padding-bottom для скроллбара и стрелки */
+    padding-top: 0; /* Сбросил padding-top */
   }
 
   .task-item {
     width: 90%; /* Ширина задач на планшетах */
     max-width: 400px; /* Ограничил максимальную ширину */
     padding-right: 1rem; /* Сбросил padding-right */
-    padding-bottom: 45px; /* Добавил padding-bottom для стрелки */
+    padding-top: 45px; /* Добавил padding-top для стрелки */
+    padding-bottom: 1rem; /* Скорректировал padding-bottom */
   }
 
   .task-item::after {
-    content: '↑'; /* Стрелка вверх */
-    top: auto; /* Сбросил top */
+    content: '↓'; /* Стрелка вниз */
+    top: -50px; /* Позиционируем сверху */
     right: 50%; /* Центрируем по горизонтали */
-    bottom: -50px; /* Позиционируем снизу */
+    bottom: auto; /* Сбросил bottom */
     transform: translateX(50%); /* Корректируем для центрирования */
     font-size: 2.5rem;
   }
@@ -299,6 +300,29 @@ select:focus {
 @media (max-width: 768px) {
   .task-item {
     width: 95%; /* Ширина задач на мобильных */
+  }
+
+  .task-item::after {
+    content: '↓'; /* Стрелка вниз */
+    top: -45px; /* Позиция для мобильных */
+    right: 50%;
+    bottom: auto;
+    transform: translateX(50%);
+  }
+}
+
+@media (max-width: 600px) {
+  .tasks-list-horizontal {
+    gap: 20px; /* Adjust gap for very small screens */
+  }
+  .task-item {
+    width: calc(100% - 20px); /* Adjust width to fill container on very small screens */
+    padding: 1rem 0.8rem; /* Adjust padding */
+    padding-top: 40px; /* Скорректировал padding-top */
+    padding-bottom: 1rem; /* Скорректировал padding-bottom */
+  }
+  .task-item::after {
+    top: -40px; /* Позиция для очень маленьких экранов */
   }
 }
 
