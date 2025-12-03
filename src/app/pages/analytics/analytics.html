@@ -38,12 +38,17 @@
     <div class="data-section">
       <div class="input-group">
         <label for="millingTechnologists">Количество фрезерных технологов:</label>
-        <input type="number" id="millingTechnologists" [(ngModel)]="numberOfMillingTechnologists" min="0" value="0">
+        <input type="number" id="millingTechnologists" [(ngModel)]="numberOfMillingTechnologists" min="1" value="0">
       </div>
       <div class="input-group">
         <label for="turningTechnologists">Количество токарных технологов:</label>
-        <input type="number" id="turningTechnologists" [(ngModel)]="numberOfTurningTechnologists" min="0" value="0">
+        <input type="number" id="turningTechnologists" [(ngModel)]="numberOfTurningTechnologists" min="1" value="0">
       </div>
+      <div class="input-group">
+        <label for="developers">Количество конструкторов:</label>
+        <input type="number" id="developers" [(ngModel)]="numberOfConstructors" min="1" value="0">
+      </div>
+
       <button (click)="updateAnalytics()" class="update-button">Рассчитать</button>
       <button (click)="loadAllTasks()" class="refresh-button">Обновить</button>
 
@@ -62,6 +67,11 @@
           <p><strong>Загрузка по токарным операциям ("ток.") </strong> </p>
           <p><strong>Часов:</strong> {{ displayedHoursTurning * 1.2 | number:'1.0-0' }} ч.</p>
           <p><strong>Дней:</strong> {{ totalDaysTurning * 1.2 | ceil | number:'1.0-0' }} д. </p>
+        </div>
+        <div class="analytics-item">
+          <p><strong>Загрузка конструктора </strong> </p>
+          <p><strong>Часов:</strong> {{ displayedHoursDevelopers * 1.2 | number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysDevelopers * 1.2 | ceil | number:'1.0-0' }} д. </p>
         </div>
         <div class="analytics-item">
           <p><strong>Загрузка по другим задачам (написание структур, тех процессов и т.д.) </strong> </p>
