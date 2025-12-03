@@ -299,13 +299,14 @@ select:focus {
 }
 
 @media (max-width: 768px) {
+
   .task-item {
     width: 95%; /* Ширина задач на мобильных */
   }
 
   .task-item::after {
     content: '↓'; /* Стрелка вниз */
-    top: -45px; /* Позиция для мобильных */
+    top: -75px; /* Позиция для мобильных */
     right: 50%;
     bottom: auto;
     transform: translateX(50%);
@@ -314,7 +315,7 @@ select:focus {
 
 @media (max-width: 600px) {
   .tasks-list-horizontal {
-    gap: 20px; /* Adjust gap for very small screens */
+    gap: 50px; /* Adjust gap for very small screens */
   }
   .task-item {
     width: calc(100% - 20px); /* Adjust width to fill container on very small screens */
@@ -323,7 +324,7 @@ select:focus {
     padding-bottom: 1rem; /* Скорректировал padding-bottom */
   }
   .task-item::after {
-    top: -40px; /* Позиция для очень маленьких экранов */
+    top: -60px; /* Позиция для очень маленьких экранов */
   }
 }
 
