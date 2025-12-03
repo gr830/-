@@ -4,7 +4,7 @@
 <div class="tasks-controls">
   <label>
     Поиск по названию:
-    <input type="text" [(ngModel)]="searchTitle" placeholder="Введите название задачи..." />
+    <input type="text" [(ngModel)]="searchTitle" placeholder="Введите название задачи..." (keydown.enter)="searchTasks()" />
   </label>
   <label>
     ID группы:
@@ -25,11 +25,17 @@
     <input type="date" [(ngModel)]="deadlineTo" />
   </label>
   <button (click)="clearDeadlineFilter()">Сбросить дедлайн</button>
-  <button (click)="searchTasks()" style="background:linear-gradient(90deg,#50c878 0%,#179edc 100%);font-size:1.1rem;min-width:120px;">Искать</button>
+  <!-- <button (click)="searchTasks()" style="background:linear-gradient(90deg,#50c878 0%,#179edc 100%);font-size:1.1rem;min-width:120px;">Искать</button> -->
 </div>
 
 <div *ngIf="loading">Загрузка...</div>
 <div *ngIf="error" class="error-message">{{ error }}</div>
+
+<div *ngIf="totalCalculatedHours > 0" class="total-time-display" >
+  <h3>Общее время по найденным задачам:</h3>
+  <p><b>Часов:</b> {{ totalCalculatedHours * 1.2 | number:'1.0-0' }} ч.</p>
+  <p><b>Дней:</b> {{ totalCalculatedDays * 1.2 | number:'1.0-0' }} д.</p>
+</div>
 
 <div *ngIf="!loading && !error && tasks.length > 0" class="search-results">
   <div *ngFor="let task of tasks" class="search-result-card">

@@ -48,6 +48,11 @@ export class SearchComponent implements OnInit {
   pageSize: number = PAGE_SIZE;
   total: number = 0;
 
+  totalCalculatedHours: number = 0; // New property for total calculated hours
+  totalCalculatedDays: number = 0; // New property for total calculated days
+
+  allFetchedTasks: any[] = []; // New property to store all fetched tasks
+
   constructor(private router: Router) { }
 
   ngOnInit(): void {
@@ -58,26 +63,30 @@ export class SearchComponent implements OnInit {
     this.searchTasks(); // Выполняем первый поиск при загрузке страницы
   }
 
-  searchTasks() {
+  async searchTasks() {
     this.loading = true;
     this.error = '';
+    this.allFetchedTasks = []; // Clear previous results
+    this.total = 0;
+
+    let currentPage = 0; // Start with the first page
+    let hasMore = true;
 
     const baseUrl = 'https://grosver-group.bitrix24.by/rest/196/gh4cf21vcpwrgub8/tasks.task.list';
-    const url = new URL(baseUrl);
-    const params = new URLSearchParams();
+    const baseParams = new URLSearchParams();
 
     // Параметры фильтрации
     if (this.searchTitle) {
-      params.set('filter[TITLE]', this.searchTitle);
+      baseParams.set('filter[TITLE]', this.searchTitle);
     }
     if (this.groupId) {
-      params.set('filter[GROUP_ID]', String(this.groupId));
+      baseParams.set('filter[GROUP_ID]', String(this.groupId));
     }
     if (this.responsibleId) {
-      params.set('filter[RESPONSIBLE_ID]', String(this.responsibleId));
+      baseParams.set('filter[RESPONSIBLE_ID]', String(this.responsibleId));
     }
     if (this.selectedStatus !== 0) {
-      params.set('filter[REAL_STATUS]', String(this.selectedStatus));
+      baseParams.set('filter[REAL_STATUS]', String(this.selectedStatus));
     }
 
     // Фильтр по дедлайну
@@ -87,49 +96,65 @@ export class SearchComponent implements OnInit {
       [from, to] = [to, from]; // Корректируем, если даты введены в неверном порядке
     }
     if (from) {
-      params.set('filter[>=DEADLINE]', this.formatDeadlineForFilter(from, false));
+      baseParams.set('filter[>=DEADLINE]', this.formatDeadlineForFilter(from, false));
     }
     if (to) {
-      params.set('filter[<=DEADLINE]', this.formatDeadlineForFilter(to, true));
+      baseParams.set('filter[<=DEADLINE]', this.formatDeadlineForFilter(to, true));
     }
 
     // Параметры выбора полей и сортировки (из примера запроса)
-    params.set('select[0]', 'ID');
-    params.set('select[1]', 'TITLE');
-    params.set('select[2]', 'STATUS');
-    params.set('select[3]', 'RESPONSIBLE_ID');
-    params.set('select[4]', 'DEADLINE');
-    params.set('select[5]', 'DURATION_PLAN');
-    params.set('order[ID]', 'asc');
+    baseParams.set('select[0]', 'ID');
+    baseParams.set('select[1]', 'TITLE');
+    baseParams.set('select[2]', 'STATUS');
+    baseParams.set('select[3]', 'RESPONSIBLE_ID');
+    baseParams.set('select[4]', 'DEADLINE');
+    baseParams.set('select[5]', 'DURATION_PLAN');
+    baseParams.set('order[ID]', 'asc');
 
-    // Параметры пагинации
-    params.set('start', String((this.page - 1) * this.pageSize));
+    while (hasMore) {
+      const url = new URL(baseUrl);
+      const params = new URLSearchParams(baseParams);
+      params.set('start', String(currentPage * this.pageSize));
+      url.search = params.toString();
 
-    url.search = params.toString();
-
-    try { console.log('[search] request:', url.toString()); } catch {}
-
-    fetch(url.toString())
-      .then(async response => {
+      try {
+        const response = await fetch(url.toString());
         if (!response.ok) {
           let message = `HTTP ${response.status}`;
           try {
             const err = await response.json();
             message = err?.error_description || err?.error || message;
-          } catch {}
+          } catch { }
           throw new Error(message);
         }
-        return response.json();
-      })
-      .then(data => {
-        this.tasks = data.result?.tasks || [];
-        this.total = data.total || data.result?.total || this.tasks.length; // Используем data.total для общего количества
+        const data = await response.json();
+
+        const fetchedTasks = data.result?.tasks || [];
+        this.allFetchedTasks = this.allFetchedTasks.concat(fetchedTasks); // Accumulate all tasks
+        this.total = data.total || data.result?.total || this.allFetchedTasks.length;
+
+        if (fetchedTasks.length < this.pageSize || this.allFetchedTasks.length >= this.total) {
+          hasMore = false;
+        } else {
+          currentPage++;
+        }
+
+      } catch (err) {
+        this.error = `Ошибка поиска задач: ${err instanceof Error ? err.message : String(err)}`;
         this.loading = false;
-      })
-      .catch(err => {
-        this.error = `Ошибка поиска задач: ${err?.message || err}`;
-        this.loading = false;
-      });
+        return; // Stop further fetching on error
+      }
+    }
+
+    this.loading = false;
+    this.updateDisplayedTasks(); // Update displayed tasks after all are fetched
+    this.calculateTotalTime(); // Calculate total time after all tasks are loaded
+  }
+
+  private updateDisplayedTasks(): void {
+    const startIndex = (this.page - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.tasks = this.allFetchedTasks.slice(startIndex, endIndex);
   }
 
   clearDeadlineFilter() {
@@ -139,17 +164,29 @@ export class SearchComponent implements OnInit {
     this.searchTasks();
   }
 
+  calculateTotalTime(): void {
+    let totalHours = 0;
+    for (const task of this.allFetchedTasks) { // Iterate over allFetchedTasks
+      const duration = parseFloat(task.durationPlan || '0');
+      if (!isNaN(duration)) {
+        totalHours += duration;
+      }
+    }
+    this.totalCalculatedHours = totalHours;
+    this.totalCalculatedDays = totalHours / 8; // Assuming 8 working hours per day
+  }
+
   nextPage() {
     if (this.page * this.pageSize < this.total) {
       this.page++;
-      this.searchTasks();
+      this.updateDisplayedTasks(); // Update displayed tasks from allFetchedTasks
     }
   }
 
   prevPage() {
     if (this.page > 1) {
       this.page--;
-      this.searchTasks();
+      this.updateDisplayedTasks(); // Update displayed tasks from allFetchedTasks
     }
   }
 
@@ -214,6 +251,13 @@ export class SearchComponent implements OnInit {
     const year = parseInt(yearStr, 10);
     const month = parseInt(monthStr, 10);
     const day = parseInt(dayStr, 10);
+
+    // Validate parsed date components
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+      console.warn(`formatDeadlineForFilter: Invalid date string components: ${dateString}`);
+      return ''; // Return empty string for invalid dates
+    }
+
     const hours = endOfDay ? 23 : 0;
     const minutes = endOfDay ? 59 : 0;
     const seconds = endOfDay ? 59 : 0;
@@ -241,3 +285,4 @@ export class SearchComponent implements OnInit {
     this.router.navigate(['/tasks']);
   }
 }
+
