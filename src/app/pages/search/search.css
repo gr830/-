@@ -158,12 +158,12 @@ select:focus {
   font-size: 1.3em;
 }
 
-.total-time-display p {
+.total-time-display span {
   margin: 5px 0;
   font-size: 1.1em;
 }
 
-.total-time-display p b {
+.total-time-display span b {
   color: #00796b; /* Slightly darker green for labels */
 }
 
