@@ -31,10 +31,10 @@
 <div *ngIf="loading">Загрузка...</div>
 <div *ngIf="error" class="error-message">{{ error }}</div>
 
-<div *ngIf="totalCalculatedHours > 0" class="total-time-display" >
-  <h3>Общее время по найденным задачам:</h3>
-  <p><b>Часов:</b> {{ totalCalculatedHours * 1.2 | number:'1.0-0' }} ч.</p>
-  <p><b>Дней:</b> {{ totalCalculatedDays * 1.2 | number:'1.0-0' }} д.</p>
+<div *ngIf="totalCalculatedHours > 0" class="total-time-display">
+  <h3>Общее время по задачам:</h3>
+  <p><b>Часов:</b> {{ totalCalculatedHours | number:'1.0-0' }} ч.</p>
+  <p><b>Дней:</b> {{ totalCalculatedDays | number:'1.0-0' }} д.</p>
 </div>
 
 <div *ngIf="!loading && !error && tasks.length > 0" class="search-results">

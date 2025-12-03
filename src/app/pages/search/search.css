@@ -138,8 +138,33 @@ select:focus {
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: 20px;
   padding-bottom: 2rem;
+}
+
+.total-time-display {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #179edc;
+  border-radius: 8px;
+  background-color: #e0f7fa; /* Light blue background */
+  color: #004d40; /* Dark green text */
+  text-align: center;
+}
+
+.total-time-display h3 {
+  color: #179edc;
+  margin-bottom: 10px;
+  font-size: 1.3em;
+}
+
+.total-time-display p {
+  margin: 5px 0;
+  font-size: 1.1em;
+}
+
+.total-time-display p b {
+  color: #00796b; /* Slightly darker green for labels */
 }
 
 .search-result-card {
