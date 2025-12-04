@@ -14,7 +14,7 @@
   <label>
     Статус:
     <select [(ngModel)]="selectedStatus">
-      <option *ngFor="let status of statusList" [value]="status.value">{{ status.label }}</option>
+      <option *ngFor="let status of statusList" [ngValue]="status.value">{{ status.label }}</option>
     </select>
   </label>
   <label>

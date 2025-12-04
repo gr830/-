@@ -60,7 +60,7 @@ export class SearchComponent implements OnInit {
     // const todayStr = this.formatDateForInput(new Date());
     // this.deadlineFrom = todayStr;
     // this.deadlineTo = todayStr;
-    // this.searchTasks(); // Выполняем первый поиск при загрузке страницы
+    this.searchTasks(); // Выполняем первый поиск при загрузке страницы
   }
 
   async searchTasks() {
