@@ -286,11 +286,10 @@ select:focus {
 
   .task-item::after {
     content: '↓'; /* Стрелка вниз */
-    top: -50px; /* Позиционируем сверху */
-    right: 50%; /* Центрируем по горизонтали */
-    bottom: auto; /* Сбросил bottom */
-    transform: translateX(50%); /* Корректируем для центрирования */
-    font-size: 2.5rem;
+    top: auto; /* Позиция для мобильных */
+    right: 50%;
+    bottom: -75px; /* Скорректировал позицию снизу */
+    transform: translateX(50%) rotate(0deg);
   }
 
   .task-item.last-task-item::after {
@@ -306,10 +305,10 @@ select:focus {
 
   .task-item::after {
     content: '↓'; /* Стрелка вниз */
-    top: -75px; /* Позиция для мобильных */
+    top: auto; /* Позиция для мобильных */
     right: 50%;
-    bottom: auto;
-    transform: translateX(50%);
+    bottom: -75px; /* Скорректировал позицию снизу */
+    transform: translateX(50%) rotate(0deg);
   }
 }
 
@@ -324,7 +323,8 @@ select:focus {
     padding-bottom: 1rem; /* Скорректировал padding-bottom */
   }
   .task-item::after {
-    top: -60px; /* Позиция для очень маленьких экранов */
+    top: auto; /* Позиция для очень маленьких экранов */
+    bottom: -60px; /* Скорректировал позицию снизу */
   }
 }
 
