@@ -241,6 +241,26 @@ select:focus {
   width: auto; /* Allow content to dictate width, not fixed 100% */
 }
 
+/* Custom Scrollbar Styles */
+.tasks-list-horizontal::-webkit-scrollbar {
+  height: 25px; /* Thicker scrollbar */
+}
+
+.tasks-list-horizontal::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light background for the track */
+  border-radius: 10px;
+}
+
+.tasks-list-horizontal::-webkit-scrollbar-thumb {
+  background: #179edc; /* Blue color for the thumb */
+  border-radius: 10px;
+  border: 3px solid #f1f1f1; /* Padding around the thumb */
+}
+
+.tasks-list-horizontal::-webkit-scrollbar-thumb:hover {
+  background: #0d8cc2; /* Darker blue on hover */
+}
+
 .task-item {
   transform: scale(0.95);
   flex-shrink: 0;
