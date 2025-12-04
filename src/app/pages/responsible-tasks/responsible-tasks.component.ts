@@ -150,6 +150,7 @@ export class ResponsibleTasksComponent implements OnInit {
 
     this.allFetchedTasks = this.sortTasksCustom(this.allFetchedTasks);
     this.tasks = this.allFetchedTasks; // Display all fetched and sorted tasks
+    this.tasks = this.tasks.filter(task => task.endDatePlan);
     this.populateResponsibleList(this.allFetchedTasks); // Update responsible list with all fetched tasks
     this.loading = false;
     this.showTasksList = true;
