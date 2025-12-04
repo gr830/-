@@ -48,6 +48,9 @@ export class ResponsibleTasksComponent implements OnInit {
   public responsibleIdToName: Record<number, string> = {};
   selectedResponsibleIcon: string | null = null;
   showTasksList = false;
+  lastTaskDueDate: string | null = null;
+  totalTasksDuration: number = 0;
+  totalWorkingDays: string = '0';
 
   constructor(private router: Router) {}
 
@@ -153,6 +156,26 @@ export class ResponsibleTasksComponent implements OnInit {
 
     if (this.tasks.length === 0) {
       this.error = 'Задачи для выбранного исполнителя не найдены.';
+      this.lastTaskDueDate = null;
+      this.totalTasksDuration = 0;
+      this.totalWorkingDays = '0';
+    } else {
+      // Calculate last task due date
+      const lastTask = this.tasks[this.tasks.length - 1];
+      if (lastTask && (lastTask.endDatePlan || lastTask.deadline)) {
+        this.lastTaskDueDate = this.formatDeadline(lastTask.endDatePlan || lastTask.deadline);
+      } else {
+        this.lastTaskDueDate = null;
+      }
+
+      // Calculate total tasks duration
+      this.totalTasksDuration = this.tasks.reduce((sum, task) => {
+        const duration = task.durationPlan ? parseFloat(task.durationPlan) : 0;
+        return sum + duration;
+      }, 0);
+
+      // Calculate total working days (divide by 8)
+      this.totalWorkingDays = (this.totalTasksDuration / 8).toFixed(2);
     }
   }
 

@@ -159,6 +159,47 @@ select:focus {
   font-size: 1.2rem;
   color: #555;
   margin-top: 2rem;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #e0e0e0;
+}
+
+.tasks-summary {
+  margin-top: 2.5rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #e0f2f7 0%, #d1e9f1 100%);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px 0 rgba(23, 158, 220, 0.15);
+  color: #0d47a1; /* Deep blue for text */
+  font-size: 1.15rem;
+  line-height: 1.6;
+  border: 1px solid #b3e5fc;
+  max-width: 800px; /* Limit width for better readability */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tasks-summary p {
+  font-size: 1.5rem;
+  margin-bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+}
+
+.tasks-summary p:last-child {
+  margin-bottom: 0;
+}
+
+.tasks-summary b {
+  font-size: 1.5rem;
+  color: #179edc;
+  font-weight: 700;
+  margin-right: 0.5rem;
 }
 
 .responsible-tasks-container {
@@ -310,6 +351,18 @@ select:focus {
     bottom: -75px; /* Скорректировал позицию снизу */
     transform: translateX(50%) rotate(0deg);
   }
+  .tasks-summary {
+    padding: 1rem 1.2rem;
+    font-size: 1rem;
+  }
+  .tasks-summary b {
+    margin-right: 0.3rem;
+  }
+  .no-tasks-message {
+    max-width: 90%;
+    font-size: 1rem;
+    padding: 15px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -349,6 +402,22 @@ select:focus {
   .avatar-placeholder {
     width: 70px;
     height: 70px;
+  }
+  .tasks-summary {
+    margin-top: 2rem;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
+  .tasks-summary p {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tasks-summary b {
+    margin-bottom: 0.2rem;
+  }
+  .no-tasks-message {
+    font-size: 0.95rem;
+    padding: 12px;
   }
 }
 

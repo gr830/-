@@ -42,6 +42,12 @@
     </ul>
   </div>
 
+  <div *ngIf="showTasksList && tasks.length > 0 && !loading && !error" class="tasks-summary">
+    <p *ngIf="lastTaskDueDate"><b>Крайний срок последней задачи:</b> {{ lastTaskDueDate }}</p>
+    <p><b>Общее время выполнения всех задач:</b> {{ totalTasksDuration | number:'1.0-0' }} ч.</p>
+    <p><b>Общее количество рабочих дней:</b> {{ totalWorkingDays | number:'1.0-0'}} д.</p>
+  </div>
+
   <div *ngIf="showTasksList && tasks.length === 0 && !loading && !error" class="no-tasks-message">
     Задачи для выбранного исполнителя не найдены.
   </div>
