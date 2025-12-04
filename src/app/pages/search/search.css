@@ -266,6 +266,11 @@ select:focus {
     margin: 0 0 0.8rem 0;
   }
 
+  .search-button {
+    width: auto; /* Allow the search button to size according to its content */
+    margin: 0 0.5rem 0 0; /* Adjust margin for proper spacing */
+  }
+  
   .search-result-card {
     width: 100%;
     max-width: 95%;

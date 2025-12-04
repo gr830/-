@@ -5,6 +5,7 @@
   <label>
     Поиск по названию:
     <input type="text" [(ngModel)]="searchTitle" placeholder="Введите название задачи..." (keydown.enter)="searchTasks()" />
+    <button (click)="searchTasks()" style="background:linear-gradient(90deg,#50c878 0%,#179edc 100%);font-size:1.1rem;min-width:120px; margin-left: 10px;">Искать</button> 
   </label>
   <label>
     ID группы:
@@ -25,7 +26,7 @@
     <input type="date" [(ngModel)]="deadlineTo" />
   </label>
   <button (click)="clearDeadlineFilter()">Сбросить дедлайн</button>
-  <!-- <button (click)="searchTasks()" style="background:linear-gradient(90deg,#50c878 0%,#179edc 100%);font-size:1.1rem;min-width:120px;">Искать</button> -->
+  
 </div>
 
 <div *ngIf="loading">Загрузка...</div>
