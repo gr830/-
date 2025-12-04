@@ -56,11 +56,11 @@ export class SearchComponent implements OnInit {
   constructor(private router: Router) { }
 
   ngOnInit(): void {
-    // Инициализация дедлайна сегодняшней датой для удобства
-    const todayStr = this.formatDateForInput(new Date());
-    this.deadlineFrom = todayStr;
-    this.deadlineTo = todayStr;
-    this.searchTasks(); // Выполняем первый поиск при загрузке страницы
+    // // Инициализация дедлайна сегодняшней датой для удобства
+    // const todayStr = this.formatDateForInput(new Date());
+    // this.deadlineFrom = todayStr;
+    // this.deadlineTo = todayStr;
+    // this.searchTasks(); // Выполняем первый поиск при загрузке страницы
   }
 
   async searchTasks() {
