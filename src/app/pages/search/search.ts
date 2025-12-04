@@ -36,7 +36,7 @@ export class SearchComponent implements OnInit {
 
   // Параметры поиска
   searchTitle: string = '';
-  groupId: number = 174; // По умолчанию, как в примере
+  groupId!: number ; // По умолчанию, как в примере
   responsibleId: number = 0; // По умолчанию без фильтра по исполнителю
   selectedStatus: number = 0; // По умолчанию все статусы
   deadlineFrom: string = '';
