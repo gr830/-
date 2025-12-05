@@ -55,28 +55,28 @@
       <div *ngIf="displayedHoursAllTasks > 0; else noTasks">
         <div class="analytics-item">
           <p><strong>Общая загрузка отдела (задачи в ожидании и в работе) </strong> </p>
-          <p><strong>Часов:</strong> {{ displayedHoursAllTasks * 1.2| number:'1.0-0' }} ч.</p>
-          <p><strong>Дней:</strong> {{ totalDaysAllTasks * 1.2 | ceil | number:'1.0-0' }} д. </p>
+          <p><strong>Часов:</strong> {{ displayedHoursAllTasks | number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysAllTasks  | ceil | number:'1.0-0' }} д. </p>
         </div>
         <div class="analytics-item">
           <p><strong>Загрузка по фрезерным операциям ("фр.") </strong> </p>
-          <p><strong>Часов:</strong> {{ displayedHoursMilling * 1.2 | number:'1.0-0' }} ч.</p>
-          <p><strong>Дней:</strong> {{ totalDaysMilling *1.2  | ceil | number:'1.0-0' }} д. </p>
+          <p><strong>Часов:</strong> {{ displayedHoursMilling  | number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysMilling   | ceil | number:'1.0-0' }} д. </p>
         </div>
         <div class="analytics-item">
           <p><strong>Загрузка по токарным операциям ("ток.") </strong> </p>
-          <p><strong>Часов:</strong> {{ displayedHoursTurning * 1.2 | number:'1.0-0' }} ч.</p>
-          <p><strong>Дней:</strong> {{ totalDaysTurning * 1.2 | ceil | number:'1.0-0' }} д. </p>
+          <p><strong>Часов:</strong> {{ displayedHoursTurning  | number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysTurning  | ceil | number:'1.0-0' }} д. </p>
         </div>
         <div class="analytics-item">
           <p><strong>Загрузка конструктора ("Разработка")</strong> </p>
-          <p><strong>Часов:</strong> {{ displayedHoursDevelopers * 1.2 | number:'1.0-0' }} ч.</p>
-          <p><strong>Дней:</strong> {{ totalDaysDevelopers * 1.2 | ceil | number:'1.0-0' }} д. </p>
+          <p><strong>Часов:</strong> {{ displayedHoursDevelopers  | number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysDevelopers  | ceil | number:'1.0-0' }} д. </p>
         </div>
         <div class="analytics-item">
           <p><strong>Загрузка по другим задачам (написание структур, тех процессов и т.д.) </strong> </p>
-          <p><strong>Часов:</strong> {{ displayedHoursOtherTasks * 1.2 | number:'1.0-0' }} ч.</p>
-          <p><strong>Дней:</strong> {{ totalDaysOtherTasks * 1.2 | ceil | number:'1.0-0'}} д. </p>
+          <p><strong>Часов:</strong> {{ displayedHoursOtherTasks  | number:'1.0-0' }} ч.</p>
+          <p><strong>Дней:</strong> {{ totalDaysOtherTasks  | ceil | number:'1.0-0'}} д. </p>
         </div>
       </div>
       <ng-template #noTasks>
