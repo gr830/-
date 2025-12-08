@@ -109,6 +109,8 @@ export class SearchComponent implements OnInit {
     baseParams.set('select[3]', 'RESPONSIBLE_ID');
     baseParams.set('select[4]', 'DEADLINE');
     baseParams.set('select[5]', 'DURATION_PLAN');
+    baseParams.set('select[6]', 'START_DATE_PLAN'); // Add START_DATE_PLAN
+    baseParams.set('select[7]', 'END_DATE_PLAN');   // Add END_DATE_PLAN
     baseParams.set('order[ID]', 'asc');
 
     while (hasMore) {
