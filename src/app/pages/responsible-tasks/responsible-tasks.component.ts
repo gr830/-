@@ -39,18 +39,31 @@ const PAGE_SIZE = 50;
 export class ResponsibleTasksComponent implements OnInit {
   loading = false;
   error = '';
-  tasks: any[] = [];
+  tasks: any[] = []; // For single responsible tasks
   allFetchedTasks: any[] = [];
   responsibleList: Array<{ value: number; label: string }> = [
-    { value: 0, label: 'Выберите исполнителя' }
+    { value: 0, label: 'Все исполнители' } // Changed to show "All executors" as the first option
   ];
-  selectedResponsible = 0;
+  selectedResponsible = -1; // -1 means nothing selected, 0 means all executors
   public responsibleIdToName: Record<number, string> = {};
   selectedResponsibleIcon: string | null = null;
   showTasksList = false;
   lastTaskDueDate: string | null = null;
   totalTasksDuration: number = 0;
   totalWorkingDays: string = '0';
+
+  // Property to hold tasks grouped by responsible (for all executors view)
+  allTasksByResponsible: Array<{
+    responsibleId: number;
+    tasks: any[];
+    lastTaskDueDate: string | null;
+    totalTasksDuration: number;
+    totalWorkingDays: string;
+    icon: string | null;
+  }> = [];
+
+  showExecutorSelection = false; // Flag to show/hide executor selection panel
+  selectedExecutors: number[] = []; // List of selected executors for "All executors" view
 
   constructor(private router: Router) {}
 
@@ -61,6 +74,7 @@ export class ResponsibleTasksComponent implements OnInit {
     }
     this.loadResponsibleFromStorage();
     this.rebuildResponsibleListFromMap();
+    this.loadSelectedExecutorsFromStorage();
   }
 
   goBack() {
@@ -70,14 +84,14 @@ export class ResponsibleTasksComponent implements OnInit {
   onResponsibleChange(value: any) {
     this.selectedResponsible = Number(value);
     this.tasks = [];
+    this.allTasksByResponsible = [];
     this.showTasksList = false;
     this.selectedResponsibleIcon = null; // Сброс аватара при смене исполнителя
   }
 
   async generateResponsibleTasks() {
-    if (this.selectedResponsible === 0) {
-      this.error = 'Пожалуйста, выберите исполнителя.';
-      this.tasks = [];
+    if (this.selectedResponsible === -1) {
+      this.error = 'Пожалуйста, выберите исполнителя или "Все исполнители".';
       this.showTasksList = false;
       return;
     }
@@ -86,16 +100,25 @@ export class ResponsibleTasksComponent implements OnInit {
     this.error = '';
     this.allFetchedTasks = [];
     this.tasks = [];
+    this.allTasksByResponsible = [];
     this.showTasksList = false;
 
     let start = 0;
     let hasMore = true;
 
+    // Determine if we're fetching for a specific responsible or all responsibles
+    const fetchForAllResponsibles = this.selectedResponsible === 0;
+
     while (hasMore) {
       const url = new URL(`${BASE_URL}/tasks.task.list`);
       const params = new URLSearchParams();
       params.set('filter[GROUP_ID]', String(GROUP_ID));
-      params.set('filter[RESPONSIBLE_ID]', String(this.selectedResponsible));
+
+      // Only add responsible filter if we're not fetching for all responsibles
+      if (!fetchForAllResponsibles) {
+        params.set('filter[RESPONSIBLE_ID]', String(this.selectedResponsible));
+      }
+
       params.set('filter[REAL_STATUS][]', String(STATUS_LIST_FILTER[0].value)); // Ждут выполнения
       params.append('filter[REAL_STATUS][]', String(STATUS_LIST_FILTER[1].value)); // В работе
       params.set('order[END_DATE_PLAN]', 'asc');
@@ -129,9 +152,9 @@ export class ResponsibleTasksComponent implements OnInit {
 
         const fetchedTasks = data.result?.tasks || [];
         this.allFetchedTasks.push(...fetchedTasks);
-        
-        // Capture responsible icon from the first task if available
-        if (this.selectedResponsibleIcon === null && fetchedTasks.length > 0) {
+
+        // Capture responsible icon from the first task if available (for single responsible view)
+        if (!fetchForAllResponsibles && this.selectedResponsibleIcon === null && fetchedTasks.length > 0) {
           this.selectedResponsibleIcon = fetchedTasks[0]?.responsible?.icon || null;
         }
 
@@ -148,35 +171,50 @@ export class ResponsibleTasksComponent implements OnInit {
       }
     }
 
-    this.allFetchedTasks = this.sortTasksCustom(this.allFetchedTasks);
-    this.tasks = this.allFetchedTasks; // Display all fetched and sorted tasks
-    this.tasks = this.tasks.filter(task => task.endDatePlan);
-    this.populateResponsibleList(this.allFetchedTasks); // Update responsible list with all fetched tasks
+    if (fetchForAllResponsibles) {
+      // Group tasks by responsible for the "All responsibles" view
+      this.groupTasksByResponsible();
+    } else {
+      // Process tasks for single responsible
+      this.allFetchedTasks = this.sortTasksCustom(this.allFetchedTasks);
+      this.tasks = this.allFetchedTasks; // Display all fetched and sorted tasks
+      this.tasks = this.tasks.filter(task => task.endDatePlan);
+      this.populateResponsibleList(this.allFetchedTasks); // Update responsible list with all fetched tasks
+
+      if (this.tasks.length === 0) {
+        this.error = 'Задачи для выбранного исполнителя не найдены.';
+        this.lastTaskDueDate = null;
+        this.totalTasksDuration = 0;
+        this.totalWorkingDays = '0';
+      } else {
+        // Calculate last task due date
+        const lastTask = this.tasks[this.tasks.length - 1];
+        if (lastTask && (lastTask.endDatePlan || lastTask.deadline)) {
+          this.lastTaskDueDate = this.formatDeadline(lastTask.endDatePlan || lastTask.deadline);
+        } else {
+          this.lastTaskDueDate = null;
+        }
+
+        // Calculate total tasks duration
+        this.totalTasksDuration = this.tasks.reduce((sum, task) => {
+          const duration = task.durationPlan ? parseFloat(task.durationPlan) : 0;
+          return sum + duration;
+        }, 0);
+
+        // Calculate total working days (divide by 8)
+        this.totalWorkingDays = (this.totalTasksDuration / 8).toFixed(2);
+      }
+    }
+
     this.loading = false;
     this.showTasksList = true;
 
-    if (this.tasks.length === 0) {
-      this.error = 'Задачи для выбранного исполнителя не найдены.';
-      this.lastTaskDueDate = null;
-      this.totalTasksDuration = 0;
-      this.totalWorkingDays = '0';
-    } else {
-      // Calculate last task due date
-      const lastTask = this.tasks[this.tasks.length - 1];
-      if (lastTask && (lastTask.endDatePlan || lastTask.deadline)) {
-        this.lastTaskDueDate = this.formatDeadline(lastTask.endDatePlan || lastTask.deadline);
+    if (this.allFetchedTasks.length === 0) {
+      if (fetchForAllResponsibles) {
+        this.error = 'Задачи для исполнителей не найдены.';
       } else {
-        this.lastTaskDueDate = null;
+        this.error = 'Задачи для выбранного исполнителя не найдены.';
       }
-
-      // Calculate total tasks duration
-      this.totalTasksDuration = this.tasks.reduce((sum, task) => {
-        const duration = task.durationPlan ? parseFloat(task.durationPlan) : 0;
-        return sum + duration;
-      }, 0);
-
-      // Calculate total working days (divide by 8)
-      this.totalWorkingDays = (this.totalTasksDuration / 8).toFixed(2);
     }
   }
 
@@ -195,6 +233,97 @@ export class ResponsibleTasksComponent implements OnInit {
         return 0;  // Neither has a date, maintain relative order
       }
     });
+  }
+
+  private groupTasksByResponsible() {
+    // Group tasks by responsible ID
+    const groupedTasks: Record<number, any[]> = {};
+    const responsibleIcons: Record<number, string | null> = {};
+
+    for (const task of this.allFetchedTasks) {
+      const rawId = task?.responsibleId || task?.RESPONSIBLE_ID;
+      const id = typeof rawId === 'string' ? parseInt(rawId, 10) : rawId;
+
+      if (typeof id === 'number' && id > 0) {
+        // Only include tasks for selected executors (if we're in "All executors" mode)
+        if (this.selectedResponsible === 0 && this.selectedExecutors.length > 0 && !this.selectedExecutors.includes(id)) {
+          continue; // Skip tasks for unselected executors
+        }
+
+        if (!groupedTasks[id]) {
+          groupedTasks[id] = [];
+        }
+        groupedTasks[id].push(task);
+
+        // Store the icon for this responsible if available
+        if (task?.responsible?.icon) {
+          responsibleIcons[id] = task.responsible.icon;
+        }
+      }
+
+      // Update responsible name mapping
+      const name = task?.responsible?.name;
+      if (typeof id === 'number' && id > 0 && typeof name === 'string' && name.trim()) {
+        this.responsibleIdToName[id] = name.trim();
+      }
+    }
+
+    // Convert grouped tasks to the required format with summaries
+    this.allTasksByResponsible = Object.entries(groupedTasks).map(([responsibleIdStr, tasks]) => {
+      const responsibleId = Number(responsibleIdStr);
+
+      // Filter tasks that have endDatePlan
+      const filteredTasks = tasks.filter(task => task.endDatePlan);
+
+      // Sort tasks by endDatePlan
+      const sortedTasks = this.sortTasksCustom(filteredTasks);
+
+      // Calculate summary for this responsible
+      let lastTaskDueDate: string | null = null;
+      if (sortedTasks.length > 0) {
+        const lastTask = sortedTasks[sortedTasks.length - 1];
+        if (lastTask && (lastTask.endDatePlan || lastTask.deadline)) {
+          lastTaskDueDate = this.formatDeadline(lastTask.endDatePlan || lastTask.deadline);
+        }
+      }
+
+      // Calculate total tasks duration
+      const totalTasksDuration = sortedTasks.reduce((sum, task) => {
+        const duration = task.durationPlan ? parseFloat(task.durationPlan) : 0;
+        return sum + duration;
+      }, 0);
+
+      // Calculate total working days (divide by 8)
+      const totalWorkingDays = (totalTasksDuration / 8).toFixed(2);
+
+      return {
+        responsibleId,
+        tasks: sortedTasks,
+        lastTaskDueDate,
+        totalTasksDuration,
+        totalWorkingDays,
+        icon: responsibleIcons[responsibleId] || null
+      };
+    });
+
+    // Sort the responsibles alphabetically by name
+    this.allTasksByResponsible.sort((a, b) =>
+      this.getResponsibleName(a.responsibleId).localeCompare(this.getResponsibleName(b.responsibleId), 'ru')
+    );
+
+    this.persistResponsibleToStorage();
+    this.rebuildResponsibleListFromMap();
+  }
+
+  // Method to get responsible entries for the template
+  getResponsibleEntries() {
+    return this.allTasksByResponsible;
+  }
+
+  // Method to get responsible icon
+  getResponsibleIcon(responsibleId: number): string | null {
+    const responsibleEntry = this.allTasksByResponsible.find(entry => entry.responsibleId === responsibleId);
+    return responsibleEntry ? responsibleEntry.icon : null;
   }
 
   formatDeadline(dateString: string | undefined | null): string {
@@ -293,5 +422,48 @@ export class ResponsibleTasksComponent implements OnInit {
     if (typeof raw === 'number') return raw;
     const parsed = parseInt(String(raw), 10);
     return isNaN(parsed) ? 0 : parsed;
+  }
+
+  // Load selected executors from local storage
+  private loadSelectedExecutorsFromStorage() {
+    try {
+      const stored = localStorage.getItem('selectedExecutors');
+      if (stored) {
+        this.selectedExecutors = JSON.parse(stored).map(Number);
+      } else {
+        // Initialize with an empty array; will be populated when responsibles are loaded
+        this.selectedExecutors = [];
+      }
+    } catch (e) {
+      console.error('Error loading selected executors from storage:', e);
+      this.selectedExecutors = [];
+    }
+  }
+
+  // Save selected executors to local storage
+  private saveSelectedExecutorsToStorage() {
+    try {
+      localStorage.setItem('selectedExecutors', JSON.stringify(this.selectedExecutors));
+    } catch (e) {
+      console.error('Error saving selected executors to storage:', e);
+    }
+  }
+
+  // Check if an executor is selected
+  isExecutorSelected(executorId: number): boolean {
+    return this.selectedExecutors.includes(executorId);
+  }
+
+  // Toggle executor selection
+  toggleExecutorSelection(executorId: number, event: any) {
+    const isChecked = event.target.checked;
+    if (isChecked) {
+      if (!this.selectedExecutors.includes(executorId)) {
+        this.selectedExecutors.push(executorId);
+      }
+    } else {
+      this.selectedExecutors = this.selectedExecutors.filter(id => id !== executorId);
+    }
+    this.saveSelectedExecutorsToStorage();
   }
 }

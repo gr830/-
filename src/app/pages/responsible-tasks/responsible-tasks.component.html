@@ -5,17 +5,36 @@
     <label>
       Исполнитель:
       <select [ngModel]="selectedResponsible" (ngModelChange)="onResponsibleChange($event)">
-        <option *ngFor="let r of responsibleList" [value]="r.value">{{ r.label }}</option>
+        <option value="0">Все исполнители</option>
+        <option *ngFor="let r of responsibleList | slice:1" [value]="r.value">{{ r.label }}</option>
       </select>
     </label>
-    <button (click)="generateResponsibleTasks()" [disabled]="selectedResponsible === 0">Сформировать</button>
+    <button (click)="generateResponsibleTasks()" [disabled]="selectedResponsible === -1">Сформировать</button>
     <button (click)="goBack()">Назад к задачам</button>
+    <button *ngIf="selectedResponsible === 0" (click)="showExecutorSelection = !showExecutorSelection" class="executor-config-btn">
+      {{ showExecutorSelection ? 'Скрыть настройки' : 'Настроить исполнителей' }}
+    </button>
+  </div>
+
+  <div *ngIf="selectedResponsible === 0 && showExecutorSelection" class="executor-selection-panel">
+    <h4>Выберите исполнителей для отображения:</h4>
+    <div class="executor-checkboxes">
+      <label *ngFor="let r of responsibleList | slice:1" class="executor-checkbox">
+        <input
+          type="checkbox"
+          [value]="r.value"
+          [checked]="isExecutorSelected(r.value)"
+          (change)="toggleExecutorSelection(r.value, $event)">
+        {{ r.label }}
+      </label>
+    </div>
   </div>
 
   <div *ngIf="loading">Загрузка задач...</div>
   <div *ngIf="error" class="error-message">{{ error }}</div>
 
-  <div *ngIf="showTasksList && tasks.length > 0 && !loading && !error" class="responsible-tasks-container">
+  <!-- Display for single selected responsible -->
+  <div *ngIf="showTasksList && tasks.length > 0 && selectedResponsible !== 0 && !loading && !error" class="responsible-tasks-container">
     <div class="responsible-header">
       <div class="avatar-wrapper">
         <ng-container *ngIf="selectedResponsibleIcon; else initialsPlaceholder">
@@ -33,22 +52,60 @@
           <b>{{ task.title }}</b><br />
           <span *ngIf="task.startDatePlan">Начало план: {{ formatDeadline(task.startDatePlan) }}</span><br *ngIf="task.startDatePlan"/>
           <span>Завершение план: {{ formatDeadline(task.endDatePlan) }}</span><br />
-          <span *ngIf="task.durationPlan > 0">Время на выполнение: {{ task.durationPlan }} ч.</span><br />
+          <span *ngIf="task.durationPlan > 0">Время на выполнения: {{ task.durationPlan }} ч.</span><br />
           <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">
             {{ getStatusLabel(getTaskStatusValue(task)) }}
           </span>
         </li>
       </ng-container>
     </ul>
+    <div class="tasks-summary">
+      <p *ngIf="lastTaskDueDate"><b>Крайний срок последней задачи:</b> {{ lastTaskDueDate }}</p>
+      <p><b>Общее время выполнения всех задач:</b> {{ totalTasksDuration | number:'1.0-0' }} ч.</p>
+      <p><b>Общее количество рабочих дней:</b> {{ totalWorkingDays | number:'1.0-0'}} д.</p>
+    </div>
   </div>
 
-  <div *ngIf="showTasksList && tasks.length > 0 && !loading && !error" class="tasks-summary">
-    <p *ngIf="lastTaskDueDate"><b>Крайний срок последней задачи:</b> {{ lastTaskDueDate }}</p>
-    <p><b>Общее время выполнения всех задач:</b> {{ totalTasksDuration | number:'1.0-0' }} ч.</p>
-    <p><b>Общее количество рабочих дней:</b> {{ totalWorkingDays | number:'1.0-0'}} д.</p>
+  <!-- Display for all responsibles -->
+  <div *ngIf="showTasksList && allTasksByResponsible && selectedResponsible === 0 && !loading && !error">
+    <div *ngFor="let responsibleEntry of getResponsibleEntries()" class="responsible-tasks-container">
+      <div class="responsible-header">
+        <div class="avatar-wrapper">
+          <ng-container *ngIf="getResponsibleIcon(responsibleEntry.responsibleId); else initialsPlaceholder">
+            <img [src]="getResponsibleIcon(responsibleEntry.responsibleId)" alt="Responsible Avatar" class="avatar-img" />
+          </ng-container>
+          <ng-template #initialsPlaceholder>
+            <div class="avatar-placeholder">{{ getInitials(getResponsibleName(responsibleEntry.responsibleId)) }}</div>
+          </ng-template>
+        </div>
+        <h3>{{ getResponsibleName(responsibleEntry.responsibleId) }}</h3>
+      </div>
+      <ul class="tasks-list-horizontal">
+        <ng-container *ngFor="let task of responsibleEntry.tasks; let i = index">
+          <li *ngIf="task.endDatePlan" class="task-item" [class.last-task-item]="i === responsibleEntry.tasks.length - 1">
+            <b>{{ task.title }}</b><br />
+            <span *ngIf="task.startDatePlan">Начало план: {{ formatDeadline(task.startDatePlan) }}</span><br *ngIf="task.startDatePlan"/>
+            <span>Завершение план: {{ formatDeadline(task.endDatePlan) }}</span><br />
+            <span *ngIf="task.durationPlan > 0">Время на выполнение: {{ task.durationPlan }} ч.</span><br />
+            <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">
+              {{ getStatusLabel(getTaskStatusValue(task)) }}
+            </span>
+          </li>
+        </ng-container>
+      </ul>
+      <div class="tasks-summary">
+        <p *ngIf="responsibleEntry.lastTaskDueDate"><b>Крайний срок последней задачи:</b> {{ responsibleEntry.lastTaskDueDate }}</p>
+        <p><b>Общее время выполнения всех задач:</b> {{ responsibleEntry.totalTasksDuration | number:'1.0-0' }} ч.</p>
+        <p><b>Общее количество рабочих дней:</b> {{ responsibleEntry.totalWorkingDays | number:'1.0-0'}} д.</p>
+      </div>
+    </div>
   </div>
 
-  <div *ngIf="showTasksList && tasks.length === 0 && !loading && !error" class="no-tasks-message">
+  <div *ngIf="showTasksList && tasks.length === 0 && selectedResponsible !== 0 && !loading && !error" class="no-tasks-message">
     Задачи для выбранного исполнителя не найдены.
+  </div>
+
+  <div *ngIf="showTasksList && (!allTasksByResponsible || allTasksByResponsible.length === 0) && selectedResponsible === 0 && !loading && !error" class="no-tasks-message">
+    Задачи для исполнителей не найдены.
   </div>
 </div>

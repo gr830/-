@@ -461,3 +461,60 @@ select:focus {
     height: 60px;
   }
 }
+
+.executor-config-btn {
+  background: linear-gradient(90deg, #ff9800 0%, #ff5722 100%);
+  margin-left: 0.5rem;
+}
+
+.executor-config-btn:hover {
+  background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+}
+
+.executor-selection-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem auto;
+  max-width: 800px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid #b3e5fc;
+}
+
+.executor-selection-panel h4 {
+  color: #179edc;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.executor-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.executor-checkbox {
+  display: flex;
+  align-items: center;
+  background: #f5f7fa;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #50c878;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.executor-checkbox:hover {
+  background: #e8f4f8;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(23, 158, 220, 0.2);
+}
+
+.executor-checkbox input[type="checkbox"] {
+  margin-right: 0.5rem;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
