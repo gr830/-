@@ -42,7 +42,7 @@ export class ResponsibleTasksComponent implements OnInit {
   tasks: any[] = []; // For single responsible tasks
   allFetchedTasks: any[] = [];
   responsibleList: Array<{ value: number; label: string }> = [
-    { value: 0, label:  'Все исполнители' } // Changed to show "All executors" as the first option
+    { value: 0, label: 'Все исполнители' } // Changed to show "All executors" as the first option
   ];
   selectedResponsible = -1; // -1 means nothing selected, 0 means all executors
   public responsibleIdToName: Record<number, string> = {};
