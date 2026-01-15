@@ -36,7 +36,7 @@ export class SearchComponent implements OnInit {
 
   // Параметры поиска
   searchTitle: string = '';
-  groupId!: number ; // По умолчанию, как в примере
+  groupId: number = 174; // По умолчанию, как в примере
   responsibleId: number = 0; // По умолчанию без фильтра по исполнителю
   selectedStatus: number = 0; // По умолчанию все статусы
   deadlineFrom: string = '';
@@ -111,6 +111,7 @@ export class SearchComponent implements OnInit {
     baseParams.set('select[5]', 'DURATION_PLAN');
     baseParams.set('select[6]', 'START_DATE_PLAN'); // Add START_DATE_PLAN
     baseParams.set('select[7]', 'END_DATE_PLAN');   // Add END_DATE_PLAN
+    baseParams.set('select[8]', 'DESCRIPTION'); 
     baseParams.set('order[ID]', 'asc');
 
     while (hasMore) {
