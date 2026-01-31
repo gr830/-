@@ -50,9 +50,11 @@
       <ng-container *ngFor="let task of tasks; let i = index">
         <li *ngIf="task.endDatePlan" class="task-item" [class.last-task-item]="i === tasks.length - 1">
           <b>{{ task.title }}</b><br />
-          <span *ngIf="task.startDatePlan">Начало план: {{ formatDeadline(task.startDatePlan) }}</span><br *ngIf="task.startDatePlan"/>
-          <span>Завершение план: {{ formatDeadline(task.endDatePlan) }}</span><br />
-          <span *ngIf="task.durationPlan > 0">Время на выполнения: {{ task.durationPlan }} ч.</span><br />
+          <span *ngIf="task.startDatePlan">🚩 Начало план: {{ formatDeadline(task.startDatePlan) }}</span>
+          <!-- <br *ngIf="task.startDatePlan"/> -->
+          <span>🏁 Завершение план: {{ formatDeadline(task.endDatePlan) }}</span>
+          <!-- <br /> -->
+          <span *ngIf="task.durationPlan > 0">⌛ Время на выполнения: {{ task.durationPlan }} ч.</span><br />
           <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">
             {{ getStatusLabel(getTaskStatusValue(task)) }}
           </span>
@@ -84,9 +86,11 @@
         <ng-container *ngFor="let task of responsibleEntry.tasks; let i = index">
           <li *ngIf="task.endDatePlan" class="task-item" [class.last-task-item]="i === responsibleEntry.tasks.length - 1">
             <b>{{ task.title }}</b><br />
-            <span *ngIf="task.startDatePlan">Начало план: {{ formatDeadline(task.startDatePlan) }}</span><br *ngIf="task.startDatePlan"/>
-            <span>Завершение план: {{ formatDeadline(task.endDatePlan) }}</span><br />
-            <span *ngIf="task.durationPlan > 0">Время на выполнение: {{ task.durationPlan }} ч.</span><br />
+            <span *ngIf="task.startDatePlan">🚩 Начало план: {{ formatDeadline(task.startDatePlan) }}</span> 
+            <!-- <br *ngIf="task.startDatePlan"/> -->
+            <span>🏁 Завершение план: {{ formatDeadline(task.endDatePlan) }}</span>
+            <!-- <br /> -->
+            <span *ngIf="task.durationPlan > 0">⌛ Продолжительность план: {{ task.durationPlan }} ч.</span><br />
             <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">
               {{ getStatusLabel(getTaskStatusValue(task)) }}
             </span>
