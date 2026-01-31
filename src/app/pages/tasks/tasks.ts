@@ -394,12 +394,18 @@ export class Tasks implements OnInit, OnDestroy {
     if (from && to && from > to) {
       [from, to] = [to, from];
     }
+   
+    // Новый: фильтруем по плановым датам задачи (START_DATE_PLAN / END_DATE_PLAN)
+    // Новый: пересечение интервалов: start <= to  AND  end >= from
     if (from) {
-      params.set('filter[>=DEADLINE]', this.formatDeadlineForFilter(from, false));
+      // END_DATE_PLAN >= from  (закончен не раньше, чем from)
+      params.set('filter[>=END_DATE_PLAN]', this.formatDeadlineForFilter(from, false));
     }
     if (to) {
-      params.set('filter[<=DEADLINE]', this.formatDeadlineForFilter(to, true));
+      // START_DATE_PLAN <= to  (начат не позже, чем to)
+      params.set('filter[<=START_DATE_PLAN]', this.formatDeadlineForFilter(to, true));
     }
+
 
     params.set(`order[${this.sortField}]`, this.sortDirection);
     url.search = params.toString();
