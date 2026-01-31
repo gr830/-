@@ -77,9 +77,11 @@
       <h3>{{ name.key }}</h3>
       <ul>
         <li *ngFor="let task of name.value">
-          <b>{{ task.title }}</b><br />
-          <span>Дедлайн: {{ formatDeadline(task.deadline) }}</span>
-          <span *ngIf="task.durationPlan > 0">Продолжительность план: {{ task.durationPlan }} ч.</span><br />
+          <b>{{ task.title }}</b><br /><br *ngIf="task.startDatePlan"/>
+          <span *ngIf="task.startDatePlan">🚩 Начало план: {{ formatDeadline(task.startDatePlan) }}</span>
+          <span *ngIf="task.endDatePlan">🏁 Конец план: {{ formatDeadline(task.endDatePlan) }}</span>
+          <span> 📅 Дедлайн: {{ formatDeadline(task.deadline) }}</span>
+          <span *ngIf="task.durationPlan > 0"> ⌛ Продолжительность план: {{ task.durationPlan }} ч.</span><br />
           <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">
             {{ getStatusLabel(getTaskStatusValue(task)) }}
           </span>
