@@ -378,6 +378,7 @@ export class Tasks implements OnInit, OnDestroy {
     const url = new URL(baseUrl);
     const params = new URLSearchParams();
     params.set('filter[GROUP_ID]', String(this.selectedGroup));
+    params.set('filter[!RESPONSIBLE_ID]', '196'); // исключаем планировщика задач
     params.set('start', String(start));
 
     if (this.selectedStatus !== 0) {
