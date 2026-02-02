@@ -31,6 +31,7 @@ button {
   cursor: pointer;
   box-shadow: 0 2px 8px 0 #179edc22;
   transition: background 0.3s, transform 0.2s;
+  margin-left: 10px;
 }
 button:hover {
   background: linear-gradient(90deg, #50c878 0%, #179edc 100%);
@@ -263,7 +264,7 @@ select:focus {
 
   button {
     width: 100%;
-    margin: 0 0 0.8rem 0;
+    margin: 0.8rem 0 0 0;
   }
 
   .search-button {
@@ -276,4 +277,10 @@ select:focus {
     max-width: 95%;
     padding: 1rem;
   }
+
+
+  .pagination-controls button {
+    margin: 0px;
+  }
 }
+

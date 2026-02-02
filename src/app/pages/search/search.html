@@ -5,7 +5,7 @@
   <label>
     Поиск по названию:
     <input type="text" [(ngModel)]="searchTitle" placeholder="Введите название задачи..." (keydown.enter)="searchTasks()" />
-    <button (click)="searchTasks()" style="background:linear-gradient(90deg,#50c878 0%,#179edc 100%);font-size:1.1rem;min-width:120px; margin-left: 10px;">Искать</button> 
+    <button (click)="searchTasks()" style="background:linear-gradient(90deg,#50c878 0%,#179edc 100%);font-size:1.1rem;min-width:120px; ">Искать</button> 
   </label>
   <label>
     ID группы:
@@ -41,7 +41,7 @@
 <div *ngIf="!loading && !error && tasks.length > 0" class="search-results">
   <div *ngFor="let task of tasks" class="search-result-card">
     <h3>{{ task.title }}</h3>
-    <p *ngIf="task.description"><b>Описание:</b> {{ task.description }} ч.</p>
+    <p *ngIf="task.description"><b>Описание:</b> {{ task.description }} </p>
     <p><b>Статус:     </b> <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">{{ getStatusLabel(getTaskStatusValue(task)) }}</span></p>
     <p *ngIf="task.responsible"><b>Исполнитель:</b> {{ task.responsible.name === "Владислав Боднарь" ? "Задача не распределена" : task.responsible.name === "Алексей Зубрицкий" ? "Производственный цех" : task.responsible.name }} </p>
 
@@ -56,7 +56,7 @@
   <p>Задачи не найдены.</p>
 </div>
 
-<div style="margin: 10px 0; text-align:center;" class="pagination-controls">
+<div style="text-align:center;" class="pagination-controls">
   <button (click)="prevPage()" [disabled]="page === 1">Назад</button>
   <span>Страница {{ page }} (показано {{ tasks.length }} из {{ total }})</span>
   <button (click)="nextPage()" [disabled]="page * pageSize >= total">Вперёд</button>
