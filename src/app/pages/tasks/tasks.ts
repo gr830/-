@@ -333,6 +333,18 @@ export class Tasks implements OnInit, OnDestroy {
     this.fetchTasks();
   }
 
+  isOverdue(task: any): boolean {
+    if (!task.endDatePlan || !task.deadline) return false;
+  
+    const end = new Date(task.endDatePlan).getTime();
+    const deadline = new Date(task.deadline).getTime();
+  
+    // Для проверки: выведет в консоль true, если план позже дедлайна
+    // console.log(`${task.title}: ${end > deadline}`); 
+  
+    return end > deadline;
+  }
+
   private formatDeadlineForFilter(dateString: string, endOfDay: boolean): string {
     // Вход: YYYY-MM-DD из <input type="date">
     if (!dateString) return '';

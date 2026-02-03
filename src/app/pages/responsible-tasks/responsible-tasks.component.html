@@ -54,7 +54,8 @@
           <!-- <br *ngIf="task.startDatePlan"/> -->
           <span>🏁 Завершение план: {{ formatDeadline(task.endDatePlan) }}</span>
           <!-- <br /> -->
-          <span *ngIf="task.durationPlan > 0">⌛ Время на выполнения: {{ task.durationPlan }} ч.</span><br />
+          <span *ngIf="task.durationPlan > 0">⌛ Время на выполнения: {{ task.durationPlan }} ч.</span>
+          <span> 📅 Дедлайн: {{ formatDeadline(task.deadline) }}</span><br />
           <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">
             {{ getStatusLabel(getTaskStatusValue(task)) }}
           </span>
@@ -90,7 +91,8 @@
             <!-- <br *ngIf="task.startDatePlan"/> -->
             <span>🏁 Завершение план: {{ formatDeadline(task.endDatePlan) }}</span>
             <!-- <br /> -->
-            <span *ngIf="task.durationPlan > 0">⌛ Продолжительность план: {{ task.durationPlan }} ч.</span><br />
+            <span *ngIf="task.durationPlan > 0">⌛ Продолжительность план: {{ task.durationPlan }} ч.</span>
+            <span> 📅 Дедлайн: {{ formatDeadline(task.deadline) }}</span><br />
             <span class="task-status" [style.background-color]="getStatusColor(getTaskStatusValue(task))">
               {{ getStatusLabel(getTaskStatusValue(task)) }}
             </span>
